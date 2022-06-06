@@ -1,0 +1,977 @@
+{
+    "tiddlers": {
+        "$:/plugins/benwebber/dnd/Changelog": {
+            "title": "$:/plugins/benwebber/dnd/Changelog",
+            "text": "\\define unreleased() [[Unreleased|https://github.com/benwebber/tiddlywiki-dnd/compare/v$(latest)$..HEAD]]\n\\define issue(number) [[#$number$|https://github.com/benwebber/tiddlywiki-dnd/issues/$number$]]\n\\define release(version) [[$version$|https://github.com/benwebber/tiddlywiki-dnd/releases/tag/v$version$]]\n\\define @(name) [[@$name$|https://github.com/$name$]]\n\n<$vars latest={{$:/plugins/benwebber/dnd!!version}}>\n\n! <<unreleased>>\n</$vars>\n\n! <<release 1.2.1>> (2021-02-18)\n\n!! Fixed\n\n* Fixed incompatibility with ~KaTeX plugin that prevented spell descriptions from rendering correctly (<<issue 8>>). Thanks to <<@ lbhgh>> for reporting this bug.\n\n! <<release 1.2.0>> (2021-02-17)\n\n!! Added\n\n* Added `dnd.character` macro and view template to typeset character information (class, race, alignment, languages, and factions).\n* Added note tool to record extra notes associated with main tiddlers.\n* Added tool to export filtered \"player edition\" of the wiki. This edition excludes any tiddlers that are not explicitly tagged <$tiddler tiddler={{$:/plugins/benwebber/dnd/config/Tags/PlayerEdition}}>{{||$:/core/ui/TagTemplate}}</$tiddler>.\n\n!! Changed\n\n* Changed ''New Creature'' icon to a dragon.\n* Moved buttons to edit game tiddler attributes to tiddler toolbar.\n* Embedded attribute form directly in game tiddler edit template.\n\n!! Fixed\n\n* Fixed display of plugin buttons in toolbar lists.\n* Fixed display of qualified armour class (e.g., `15 (breastplate)`).\n\n! <<release 1.1.0>> (2019-02-15)\n\n!! Added\n\n* Added `dnd.attack` macro to typeset creature melee and ranged attacks.\n* Added `dnd.modifier` macro to calculate ability score modifiers independently.\n\n!! Changed\n\n* Make creature and spell tags configurable (<<issue 3>>).\n* Refactored localization code to work with core language switcher. Nearly all user-facing strings use this framework now (<<issue 2>>).\n\n!! Deprecated\n\n* Deprecated `dnd.dspell` and `dnd.fspell` in favour of a single template that determines the input tiddler's type. These templates will be removed in 2.0.0.\n* Deprecated `dnd.dstatblock` and `dnd.fstatblock` in favour of a single template that determines the input tiddler's type. These templates will be removed in 2.0.0.\n\n!! Fixed\n\n* `dnd.check` macro supports skills with spaces in the name (Animal Handling and Sleight of Hand).\n* Macros which expect boolean values now only consider the string \"true\" true (<<issue 5>>).\n\n! <<release 1.0.0>> (2018-08-31)\n\n!! Added\n\n* Added English (UK) and English (US) translations.\n* Added D&D icon from Font Awesome to plugin info block.\n* Set up Jest test harness, Travis CI, and Codecov.\n* Added creature view template.\n* Added spell macros, templates, and view templates.\n* Added toolbar buttons to create new creatures and spells.\n* Added modal update form for creatures and spells.\n\n!! Changed\n\n* Moved macro functionality to testable library.\n* Ported to ~TypeScript.\n* Store creature attributes as tiddler field values by default.\n\n!! Fixed\n\n* Use proper minus sign for ability/roll modifiers.\n* `dnd.average`: Pass through unrecognized roll expressions (support arbitrary values).\n\n! <<release 0.1.0>> (2018-07-31)\n\nInitial release.\n"
+        },
+        "$:/plugins/benwebber/dnd/License": {
+            "title": "$:/plugins/benwebber/dnd/License",
+            "text": "!! MIT License\n\nCopyright (c) 2018 Ben Webber\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n"
+        },
+        "$:/plugins/benwebber/dnd/PlayerEdition": {
+            "title": "$:/plugins/benwebber/dnd/PlayerEdition",
+            "text": "\\define saveTiddlerFilter()\n[is[system]] -[[$:/boot/boot.css]] -[type[application/javascript]library[yes]] -[[$:/boot/boot.js]] -[[$:/boot/bootprefix.js]] [tag{$:/plugins/benwebber/dnd/config/Tags/PlayerEdition}] +[sort[title]]\n\\end\n\\define savingEmpty()\nno\n\\end\n{{$:/core/templates/tiddlywiki5.html}}\n"
+        },
+        "$:/plugins/benwebber/dnd/README": {
+            "title": "$:/plugins/benwebber/dnd/README",
+            "text": "\\define .tool(_)\n<$vars tv-config-toolbar-text=\"yes\" tv-config-toolbar-class=\"\">\n<$transclude tiddler=\"\"\"$:/plugins/benwebber/dnd/ui/Buttons/$_$\"\"\" />\n</$vars>\n\\end\n\n\\define .noop-tool(name, caption)\n<$transclude tiddler=\"\"\"$:/plugins/benwebber/dnd/ui/Buttons/$_$\"\"\" />\n''<<dnd._lingo Buttons/$caption$/Text>>'' (<span class=\"dnd-doc-icon\">{{$:/plugins/benwebber/dnd/images/$name$}}</span>)\n\\end\n\n\\define .tag(_)\n<$macrocall $name=\"tag\" tag={{$:/plugins/benwebber/dnd/config/Tags/$_$}}/>\n\\end\n\n\\define .example(code)\n<$codeblock code=\"\"\"$code$\"\"\"/>\n\n$code$\n\\end\n\n\\define .call-row(code)\n<tr><td>`$code$`</td><td>$code$</td></tr>\n\\end\n\nManage //Dungeons & Dragons// campaigns with [[TiddlyWiki|https://tiddlywiki.com]].\n\n! Install\n\n[[Manually install|https://tiddlywiki.com/#Manually%20installing%20a%20plugin]] the plugin by dragging this link to your ~TiddlyWiki:\n\n<$list\n  filter=\"[<transclusion>prefix[{$:/plugins/benwebber/dnd/README|$:/plugins/benwebber/dnd/README|||}]]\"\n  emptyMessage=\"[[$:/plugins/benwebber/dnd]]\"\n>\n{{$:/plugins/benwebber/dnd||$:/core/ui/Components/plugin-info}}\n</$list>\n\nThen save and refresh your ~TiddlyWiki.\n\n! Quick Start\n\n!! Create a new character\n\nEnable the <<.tool new-character>> tool to create new character tiddlers with a single click.\n\nSee [[Lord Wilmore]] as an example.\n\n!! Create a new creature\n\nEnable the <<.tool new-creature>> tool to create new creature tiddlers with a single click.\n\nSee [[Goblin]] as an example.\n\n!! Create a new spell\n\nEnable the <<.tool new-spell>> tool to create new spell tiddlers with a single click.\n\nSee [[Alarm]] as an example.\n\n!! Notes\n\nYou can add notes to non-system tiddlers using the <<.noop-tool add-note AddNote>> tool.\nNotes exist as separate tiddlers associated with the main tiddler (using the note tiddler's `list` field).\nA tiddler can have more than one note.\n\nSee [[Lord Wilmore]] as an example.\n\n! Player Edition\n\nUse the <<.tool export-player-edition>> tool to export a filtered version of your wiki to share with players.\nThe player edition ''only includes'' tiddlers tagged <<.tag PlayerEdition>> and the plugin itself.\n\nNotes associated with those tiddlers ''will not'' appear in the player edition by default. You must tag them separately.\nThis makes notes a great way to add private information to otherwise public tiddlers.\n\nYou can easily publish or hide a tiddler using the <<.noop-tool public PlayerEdition>> tool.\n\n! Configuration\n\nNavigate to the plugin info tiddler ([[$:/plugins/benwebber/dnd]]), then go to the ''Settings'' tab.\n\n! Macros\n\n!! `dnd.ability`\n\nRenders an [[ability score|https://roll20.net/compendium/dnd5e/Ability%20Scores]] with its calculated modifier.\n\n<table>\n  <tr>\n    <th>Call</th>\n    <th>Output</th>\n  </tr>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.ability 8>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.ability 10>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.ability 15>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.ability 20>>\"\"\"/>\n</table>\n\n!! `dnd.attack`\n\nRenders creature attacks.\n\n!!! Attack and damage types\n\nAttack types and damage types are localized strings.\n\nTo specify an attack's type, use the following values:\n\n|! Value|! Attack Type|\n|`melee`|<<dnd._lingo StatBlock/Action/Melee>>|\n|`ranged`|<<dnd._lingo StatBlock/Action/Ranged>>|\n|`both`|<<dnd._lingo StatBlock/Action/MeleeOrRanged>>|\n\nSimilarly, to specify an attack's damage type, use its English name.\n\n|! Value|! Damage Type|\n|`acid`|<<dnd._lingo Damage/Type/Acid>>|\n|`bludgeoning`|<<dnd._lingo Damage/Type/Bludgeoning>>|\n|`cold`|<<dnd._lingo Damage/Type/Cold>>|\n|`fire`|<<dnd._lingo Damage/Type/Fire>>|\n|`force`|<<dnd._lingo Damage/Type/Force>>|\n|`lightning`|<<dnd._lingo Damage/Type/Lightning>>|\n|`necrotic`|<<dnd._lingo Damage/Type/Necrotic>>|\n|`piercing`|<<dnd._lingo Damage/Type/Piercing>>|\n|`poison`|<<dnd._lingo Damage/Type/Poison>>|\n|`psychic`|<<dnd._lingo Damage/Type/Psychic>>|\n|`radiant`|<<dnd._lingo Damage/Type/Radiant>>|\n|`slashing`|<<dnd._lingo Damage/Type/Slashing>>|\n|`thunder`|<<dnd._lingo Damage/Type/Thunder>>|\n\n!!! Simple melee, ranged, or melee and ranged attacks\n\n<$macrocall $name=\".example\" code=\"\"\"<<dnd.attack\n  name:\"Rapier\"\n  type:melee\n  bonus:\"+3\"\n  reach:\"5 ft.\"\n  damage:\"1d8+1\"\n  damageType:piercing\n>>\"\"\"/>\n\n<$macrocall $name=\".example\" code=\"\"\"<<dnd.attack\n  name:\"Heavy Crossbow\"\n  type:ranged\n  bonus:\"+2\"\n  range:\"100/400 ft.\"\n  damage:\"1d10\"\n  damageType:piercing\n>>\"\"\"/>\n\n<$macrocall $name=\".example\" code=\"\"\"<<dnd.attack\n  name:\"Dagger\"\n  type:both\n  bonus:\"+5\"\n  reach:\"5 ft.\"\n  range:\"20/60 ft.\"\n  damage:\"1d4+3\"\n  damageType:piercing\n>>\"\"\"/>\n\n!!! Attacks with extra damage\n\n<$macrocall $name=\".example\" code=\"\"\"<<dnd.attack\n  name:\"Greatsword\"\n  type:melee\n  bonus:\"+15\"\n  reach:\"5 ft.\"\n  damage:\"4d6+8\"\n  damageType:\"slashing\"\n  extraDamage:\"6d8\"\n  extraDamageType:radiant\n>>\"\"\"/>\n\n!!! Attacks with conditional damage\n\n<$macrocall $name=\".example\" code=\"\"\"<<dnd.attack\n  name:\"Longsword\"\n  type:melee\n  bonus:\"+5\"\n  reach:\"5 ft.\"\n  damage:\"1d8+3\"\n  damageType:slashing\n  condDamage:\"1d10+3\"\n  condDamageType:slashing\n  when:\"if used with two hands\"\n>>\"\"\"/>\n\n<$macrocall $name=\".example\" code=\"\"\"<<dnd.attack\n  name:\"Longsword\"\n  type:melee\n  bonus:\"+5\"\n  reach:\"5 ft.\"\n  damage:\"1d8+3\"\n  damageType:slashing\n  extraDamage:\"1d4\"\n  extraDamage:fire\n  condDamage:\"1d10+3\"\n  condDamageType:slashing\n  extraCondDamage:\"1d4\"\n  extraCondDamage:fire\n  when:\"if used with two hands\"\n>>\"\"\"/>\n\n!!! Attacks with extra effects\n\n<$macrocall $name=\".example\" code=\"\"\"<<dnd.attack\n  name:\"Light Crossbow\"\n  type:ranged\n  bonus:\"+6\"\n  range:\"80/320 ft.\"\n  damage:\"1d8+3\"\n  damageType:piercing\n  effect:\"and the target must make a DC 15 Constitution saving throw, taking 24 (7d6) poison damage on a failed save, or half as much damage on a successful one\"\n>>\"\"\"/>\n\n!!! Attacks with special targets\n\n<$macrocall $name=\".example\" code=\"\"\"<<dnd.attack\n  name:\"Dagger\"\n  type:both\n  bonus:\"+4\"\n  reach:\"5 ft.\"\n  range:\"20/60 ft.\"\n  target:\"one creature\"\n  damage:\"1d4+2\"\n  damageType:piercing\n>>\"\"\"/>\n\n!! `dnd.average`\n\nCalculates the average result of the specified roll.\n\n<table>\n  <tr>\n    <th>Call</th>\n    <th>Output</th>\n  </tr>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.average d8>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.average 2d8>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.average 2d8+2>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.average 2d8-2>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.average \"2d8 + 2\">>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.average \"2d8 - 2\">>\"\"\"/>\n</table>\n\n!! `dnd.character`\n\nHelper macro to create a standalone character tiddler.\n\nThis macro uses the [[dnd.character|$:/plugins/benwebber/dnd/templates/dnd.character]] template and stores the character's attributes as tiddler fields.\nAutomatically links class and race tiddlers if they exist.\n\nIt is ''not'' necessary to use this macro if you use the automatic view template.\n\n!! `dnd.check`\n\nTypeset an ability check, optionally including a skill and/or DC.\nThis macro is not case-sensitive.\n\nThe macro matches English abbreviations of the ability names:\n\n| Ability | Code |h\n|<<dnd._lingo Ability/STR>> |`str` |\n|<<dnd._lingo Ability/DEX>> |`dex` |\n|<<dnd._lingo Ability/CON>> |`con` |\n|<<dnd._lingo Ability/INT>> |`int` |\n|<<dnd._lingo Ability/WIS>> |`wis` |\n|<<dnd._lingo Ability/CHA>> |`cha` |\n\nIt matches English skill names by least ambiguous prefix.\nFor example, `perc`, `perf`, and `pers` for Perception, Performance, and Persuasion, respectively.\n\n| Skill | Least Ambiguous Prefix |h\n|<<dnd._lingo Skill/Acrobatics>> |`ac` |\n|<<dnd._lingo Skill/AnimalHandling>> |`an` |\n|<<dnd._lingo Skill/Arcana>> |`ar` |\n|<<dnd._lingo Skill/Athletics>> |`at` |\n|<<dnd._lingo Skill/Deception>> |`d` |\n|<<dnd._lingo Skill/History>> |`h` |\n|<<dnd._lingo Skill/Insight>> |`ins` |\n|<<dnd._lingo Skill/Intimidation>> |`int` |\n|<<dnd._lingo Skill/Investigation>> |`inv` |\n|<<dnd._lingo Skill/Medicine>> |`m` |\n|<<dnd._lingo Skill/Nature>> |`n` |\n|<<dnd._lingo Skill/Perception>> |`perc` |\n|<<dnd._lingo Skill/Performance>> |`perf` |\n|<<dnd._lingo Skill/Persuasion>> |`pers` |\n|<<dnd._lingo Skill/Religion>> |`r` |\n|<<dnd._lingo Skill/SleightOfHand>> |`sl` |\n|<<dnd._lingo Skill/Stealth>> |`st` |\n|<<dnd._lingo Skill/Survival>> |`su` |\n\nYou can also use the full skill name, such as `<<dnd.check dex acrobatics>>` or `<<dnd.check wis \"Animal Handling\">>`.\n\n<table>\n  <tr>\n    <th>Call</th>\n    <th>Output</th>\n  </tr>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.check int>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.check int dc:15>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.check int inv>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.check int inv 18>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.check cha perf>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.check cha pers>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.check wis su>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.check wis surv>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.check wis survival>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.check wis animal>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.check wis \"Animal Handling\">>\"\"\"/>\n</table>\n\nFinally, the macro supports unusual ability and skill combinations, such as asking a player to make a <<dnd.check str int>> check (`<<dnd.check str int>>`).\n\n!! `dnd.creature`\n\nHelper macro to create a standalone creature tiddler.\n\nThis macro uses the [[dnd.statblock|$:/plugins/benwebber/dnd/templates/dnd.statblock]] template and stores the creature's attributes as tiddler fields.\n\nIt is ''not'' necessary to use this macro if you use the automatic view template.\n\n!! `dnd.modifier`\n\nCalculates the modifier for a given ability score.\n\nGenerally you will want to use `dnd.ability` instead.\n\n<table>\n  <tr>\n    <th>Call</th>\n    <th>Output</th>\n  </tr>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.modifier 8>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.modifier 10>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.modifier 15>>\"\"\"/>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.modifier 20>>\"\"\"/>\n</table>\n\n!! `dnd.spell`\n\nHelper macro to create a standalone spell tiddler.\n\nThis macro uses the [[dnd.spell|$:/plugins/benwebber/dnd/templates/dnd.spell]] template and stores the spell's attributes as tiddler fields.\n\nIt is ''not'' necessary to use this macro if you use the automatic view template.\n\n!! `dnd.statblock`\n\nRender a creature stat block.\nThis is a low-level macro.\nYou may want to use the automatic view template instead (see below).\n\n!!! Notes\n\n* Ability scores default to <<dnd.ability 10>>.\n* If not set, `language` defaults to `---`.\n\n```\n<<dnd.statblock\nsize: small\ntype: humanoid\ntags: goblinoid\nalignment: \"neutral evil\"\nac: \"15 (leather armor, shield)\"\nhp: 2d6\nspeed: \"30 ft.\"\nstr: 8\ndex: 14\nwis: 8\ncha: 8\nskills: \"Stealth +6\"\nsenses: \"darkvision 60 ft., passive Perception 9\"\nlanguages: \"Common, Goblin\"\nchallenge: 1/4\n>>\n```\n\n<$reveal type=\"nomatch\" state=\"!!dnd.statblock.state\" text=\"show\">\n\n<$button set=\"!!dnd.statblock.state\" setTo=\"show\">Show</$button>\n\n</$reveal>\n\n<$reveal type=\"match\" state=\"!!dnd.statblock.state\" text=\"show\">\n\n<$button set=\"!!dnd.statblock.state\" setTo=\"hide\">Hide</$button>\n\n<<dnd.statblock\nsize: small\ntype: humanoid\ntags: goblinoid\nalignment: \"neutral evil\"\nac: \"15 (leather armor, shield)\"\nhp: 2d6\nspeed: \"30 ft.\"\nstr: 8\ndex: 14\nwis: 8\ncha: 8\nskills: \"Stealth +6\"\nsenses: \"darkvision 60 ft., passive Perception 9\"\nlanguages: \"Common, Goblin\"\nchallenge: 1/4\n>>\n\n</$reveal>\n\n!! `dnd.xp`\n\nRenders experience points (XP) for the given challenge rating (CR).\n\n!!! Standard challenge ratings\n\n<table>\n  <tr>\n    <th>Call</th>\n    <th>Output</th>\n  </tr>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.xp 0>>\"\"\" />\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.xp 0 10>>\"\"\" />\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.xp 1/2>>\"\"\" />\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.xp 5>>\"\"\" />\n</table>\n\n!!! Custom challenge ratings\n\n<table>\n  <tr>\n    <th>Call</th>\n    <th>Output</th>\n  </tr>\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.xp 40>>\"\"\" />\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.xp 40 255555>>\"\"\" />\n  <$macrocall $name=\".call-row\" code=\"\"\"<<dnd.xp unknown>>\"\"\" />\n</table>\n\n! View Templates\n\n~TiddlyWiki view templates automatically inject content into tiddlers that match certain criteria.\nThis plugin includes view templates that style all tiddlers with certain tags.\n\n| Template | Tag | Description | Example |h\n|`character` |<<.tag Characters >> |Automatically render character information. |[[Lord Wilmore]] |\n|`note` |<<.tag Notes>> |Automatically render notes related to a tiddler. |[[Lord Wilmore]] |\n|`spell` |<<.tag Spells>> |Automatically render a spell description. |[[Alarm]] |\n|`statblock` |<<.tag Creatures>> |Automatically render a stat block. |[[Goblin]] |\n\nAll templates are enabled by default.\nTo disable them and use the equivalent macros manually, navigate to the [[plugin settings tiddler|$:/plugins/benwebber/dnd]].\n\n! View Toolbar Buttons\n\nThe <<.noop-tool edit-attributes EditAttributes>> tool will automatically appear beside the ''{{$:/language/Buttons/Edit/Caption}}'' ({{$:/core/ui/Buttons/edit}}) tool on any character, creature, or spell tiddler (see ''View Templates'' above).\n\nThe <<.tool add-note>> button automatically appears on any non-system tiddler that is ''not'' tagged as a note tiddler.\n\nYou can enable or disable these buttons in the [[control panel|$:/ControlPanel]] (''Appearance > Toolbars > View Toolbar'').\n"
+        },
+        "$:/plugins/benwebber/dnd/Settings": {
+            "title": "$:/plugins/benwebber/dnd/Settings",
+            "icon": "$:/core/images/options-button",
+            "text": "\\define render-boolean(key)\n<$checkbox tiddler=\"$:/plugins/benwebber/dnd/config/$key$\" field=\"text\" checked=\"true\" unchecked=\"false\" default=\"true\" />\n\\end\n\n\\define edit-setting(key)\n<$edit-text tiddler=\"$:/plugins/benwebber/dnd/config/$key$\" field=\"text\" tag=\"input\" />\n\\end\n\n|<<dnd._lingo Settings/Version>> |{{$:/plugins/benwebber/dnd!!version}} |\n|<<dnd._lingo Settings/CharacterTag>> |<<edit-setting \"Tags/Characters\">> |\n|<<dnd._lingo Settings/CreatureTag>> |<<edit-setting \"Tags/Creatures\">> |\n|<<dnd._lingo Settings/NoteTag>> |<<edit-setting \"Tags/Notes\">> |\n|<<dnd._lingo Settings/PlayerEditionTag>> |<<edit-setting \"Tags/PlayerEdition\">> |\n|<<dnd._lingo Settings/SpellTag>> |<<edit-setting \"Tags/Spells\">> |\n|<<dnd._lingo Settings/RenderCharacters>> | <<render-boolean \"ViewTemplates/Character\">> |\n|<<dnd._lingo Settings/RenderNotes>> | <<render-boolean \"ViewTemplates/Notes\">> |\n|<<dnd._lingo Settings/RenderCreatures>> | <<render-boolean \"ViewTemplates/StatBlock\">> |\n|<<dnd._lingo Settings/RenderSpells>> | <<render-boolean \"ViewTemplates/Spell\">> |\n"
+        },
+        "$:/plugins/benwebber/dnd/Styles": {
+            "title": "$:/plugins/benwebber/dnd/Styles",
+            "tags": "$:/tags/Stylesheet",
+            "type": "text/vnd.tiddlywiki",
+            "text": ".dnd-clear {\n  clear: both;\n}\n\n.dnd-note svg {\n  fill: <<colour alert-muted-foreground>>;\n}\n\n.dnd-note-menu button:hover svg {\n  fill: <<colour foreground>>;\n}\n\n.dnd-note {\n  background: <<colour alert-background>>;\n  border-radius: 0.25rem;\n  padding: 0.5rem;\n  margin: 0.5rem 0;\n}\n\n.dnd-note-menu ul {\n  list-style: none;\n  margin: 0;\n  padding: 0;\n  float: right;\n}\n\n.dnd-note-menu li {\n  display: inline-block;\n}\n\n.dnd-doc-icon svg {\n  width: 1em;\n  height: 1em;\n  vertical-align: middle;\n}\n"
+        },
+        "$:/plugins/benwebber/dnd/templates/dnd.dspell": {
+            "title": "$:/plugins/benwebber/dnd/templates/dnd.dspell",
+            "tags": "$:/plugins/benwebber/dnd/Tags/Deprecated",
+            "text": "{{||$:/plugins/benwebber/dnd/templates/dnd.spell}}"
+        },
+        "$:/plugins/benwebber/dnd/templates/dnd.fspell": {
+            "title": "$:/plugins/benwebber/dnd/templates/dnd.fspell",
+            "tags": "$:/plugins/benwebber/dnd/Tags/Deprecated",
+            "text": "{{||$:/plugins/benwebber/dnd/templates/dnd.spell}}"
+        },
+        "$:/plugins/benwebber/dnd/templates/dnd.dstatblock": {
+            "title": "$:/plugins/benwebber/dnd/templates/dnd.dstatblock",
+            "tags": "$:/plugins/benwebber/dnd/Tags/Deprecated",
+            "text": "{{||$:/plugins/benwebber/dnd/templates/dnd.statblock}}"
+        },
+        "$:/plugins/benwebber/dnd/templates/dnd.fstatblock": {
+            "title": "$:/plugins/benwebber/dnd/templates/dnd.fstatblock",
+            "tags": "$:/plugins/benwebber/dnd/Tags/Deprecated",
+            "text": "{{||$:/plugins/benwebber/dnd/templates/dnd.statblock}}"
+        },
+        "$:/plugins/benwebber/dnd/config/Tags/Characters": {
+            "title": "$:/plugins/benwebber/dnd/config/Tags/Characters",
+            "text": "Characters"
+        },
+        "$:/plugins/benwebber/dnd/config/Tags/Creatures": {
+            "title": "$:/plugins/benwebber/dnd/config/Tags/Creatures",
+            "text": "Creatures"
+        },
+        "$:/plugins/benwebber/dnd/config/Tags/Notes": {
+            "title": "$:/plugins/benwebber/dnd/config/Tags/Notes",
+            "text": "Notes"
+        },
+        "$:/plugins/benwebber/dnd/config/Tags/PlayerEdition": {
+            "title": "$:/plugins/benwebber/dnd/config/Tags/PlayerEdition",
+            "text": "Public"
+        },
+        "$:/plugins/benwebber/dnd/config/Tags/Spells": {
+            "title": "$:/plugins/benwebber/dnd/config/Tags/Spells",
+            "text": "Spells"
+        },
+        "$:/plugins/benwebber/dnd/config/ViewTemplates/Character": {
+            "title": "$:/plugins/benwebber/dnd/config/ViewTemplates/Character",
+            "text": "true"
+        },
+        "$:/plugins/benwebber/dnd/config/ViewTemplates/Notes": {
+            "title": "$:/plugins/benwebber/dnd/config/ViewTemplates/Notes",
+            "text": "true"
+        },
+        "$:/plugins/benwebber/dnd/config/ViewTemplates/Spell": {
+            "title": "$:/plugins/benwebber/dnd/config/ViewTemplates/Spell",
+            "text": "true"
+        },
+        "$:/plugins/benwebber/dnd/config/ViewTemplates/StatBlock": {
+            "title": "$:/plugins/benwebber/dnd/config/ViewTemplates/StatBlock",
+            "text": "true"
+        },
+        "$:/plugins/benwebber/dnd/dnd.js": {
+            "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.weaponAttack = exports.hit = exports.getXP = exports.check = exports.capitalize = exports.average = exports.modifier = exports.ability = exports.StatBlock = exports.Spell = exports.Character = exports.DamageType = exports.AttackType = void 0;\n/* tslint:disable:object-literal-sort-keys */\nvar CR_TO_XP = {\n    \"0\": 0,\n    \"1/8\": 25,\n    \"1/4\": 50,\n    \"1/2\": 100,\n    \"1\": 200,\n    \"2\": 450,\n    \"3\": 700,\n    \"4\": 1100,\n    \"5\": 1800,\n    \"6\": 2300,\n    \"7\": 2900,\n    \"8\": 3900,\n    \"9\": 5000,\n    \"10\": 5900,\n    \"11\": 7200,\n    \"12\": 8400,\n    \"13\": 10000,\n    \"14\": 11500,\n    \"15\": 13000,\n    \"16\": 15000,\n    \"17\": 18000,\n    \"18\": 20000,\n    \"19\": 22000,\n    \"20\": 25000,\n    \"21\": 33000,\n    \"22\": 41000,\n    \"23\": 50000,\n    \"24\": 62000,\n    \"25\": 75000,\n    \"26\": 90000,\n    \"27\": 105000,\n    \"28\": 120000,\n    \"29\": 135000,\n    \"30\": 155000,\n};\n/* tslint:enable */\nvar SKILL_CODES_TO_CAPTIONS = {\n    ac: \"Acrobatics\",\n    an: \"AnimalHandling\",\n    ar: \"Arcana\",\n    at: \"Athletics\",\n    d: \"Deception\",\n    h: \"History\",\n    ins: \"Insight\",\n    int: \"Intimidation\",\n    inv: \"Investigation\",\n    m: \"Medicine\",\n    n: \"Nature\",\n    perc: \"Perception\",\n    perf: \"Performance\",\n    pers: \"Persuasion\",\n    r: \"Religion\",\n    sl: \"SleightOfHand\",\n    st: \"Stealth\",\n    su: \"Survival\",\n};\nvar ABILITY_REGEX = /^(STR|DEX|CON|INT|WIS|CHA).*/i;\nvar SKILL_REGEX = new RegExp(\"^(\" + Object.keys(SKILL_CODES_TO_CAPTIONS).join(\"|\") + \").*\", \"i\");\nvar AttackType;\n(function (AttackType) {\n    AttackType[AttackType[\"Melee\"] = 0] = \"Melee\";\n    AttackType[AttackType[\"Ranged\"] = 1] = \"Ranged\";\n    AttackType[AttackType[\"MeleeOrRanged\"] = 2] = \"MeleeOrRanged\";\n})(AttackType = exports.AttackType || (exports.AttackType = {}));\nvar DamageType;\n(function (DamageType) {\n    DamageType[\"Acid\"] = \"<<dnd._lingo Damage/Type/Acid>>\";\n    DamageType[\"Bludgeoning\"] = \"<<dnd._lingo Damage/Type/Bludgeoning>>\";\n    DamageType[\"Cold\"] = \"<<dnd._lingo Damage/Type/Cold>>\";\n    DamageType[\"Fire\"] = \"<<dnd._lingo Damage/Type/Fire>>\";\n    DamageType[\"Force\"] = \"<<dnd._lingo Damage/Type/Force>>\";\n    DamageType[\"Lightning\"] = \"<<dnd._lingo Damage/Type/Lightning>>\";\n    DamageType[\"Necrotic\"] = \"<<dnd._lingo Damage/Type/Necrotic>>\";\n    DamageType[\"Piercing\"] = \"<<dnd._lingo Damage/Type/Piercing>>\";\n    DamageType[\"Poison\"] = \"<<dnd._lingo Damage/Type/Poison>>\";\n    DamageType[\"Psychic\"] = \"<<dnd._lingo Damage/Type/Psychic>>\";\n    DamageType[\"Radiant\"] = \"<<dnd._lingo Damage/Type/Radiant>>\";\n    DamageType[\"Slashing\"] = \"<<dnd._lingo Damage/Type/Slashing>>\";\n    DamageType[\"Thunder\"] = \"<<dnd._lingo Damage/Type/Thunder>>\";\n})(DamageType = exports.DamageType || (exports.DamageType = {}));\nvar Character = /** @class */ (function () {\n    function Character(cls, race, alignment, languages, factions) {\n        this.cls = cls;\n        this.race = race;\n        this.alignment = alignment;\n        this.languages = languages;\n        this.factions = factions;\n    }\n    Character.prototype.render = function () {\n        var fields = [\n            { caption: \"Character/Class\", value: this.cls },\n            { caption: \"Character/Race\", value: this.race },\n            { caption: \"Character/Alignment\", value: this.alignment },\n            { caption: \"Character/Languages\", value: this.languages },\n            { caption: \"Character/Factions\", value: this.factions },\n        ];\n        var output = renderFields(fields, false);\n        output.push(\"\");\n        return output.join(\"\\n\");\n    };\n    return Character;\n}());\nexports.Character = Character;\nvar Spell = /** @class */ (function () {\n    function Spell(level, school, cast, ritual, range, verbal, somatic, material, duration) {\n        this.level = level;\n        this.school = school;\n        this.cast = cast;\n        this.ritual = ritual;\n        this.range = range;\n        this.verbal = verbal;\n        this.somatic = somatic;\n        this.material = material;\n        this.duration = duration;\n    }\n    Object.defineProperty(Spell.prototype, \"isCantrip\", {\n        get: function () {\n            return !isNaN(this.level) && this.level === 0;\n        },\n        enumerable: false,\n        configurable: true\n    });\n    Spell.prototype.render = function () {\n        var descriptionLevel = Number.isNaN(this.level) ? \"\" : this.level;\n        var output = [\n            \"//<<dnd._spellDescription level:\\\"\" + descriptionLevel + \"\\\" school:\\\"\" + this.school + \"\\\" ritual:\\\"\" + this.ritual + \"\\\">>//\",\n            \"\",\n        ];\n        var componentFragments = [];\n        if (this.verbal) {\n            componentFragments.push(\"<<dnd._lingo Spell/Verbal>>\");\n        }\n        if (this.somatic) {\n            componentFragments.push(\"<<dnd._lingo Spell/Somatic>>\");\n        }\n        if (this.material) {\n            componentFragments.push(\"<<dnd._lingo Spell/Material>> (\" + this.material + \")\");\n        }\n        var components = componentFragments.join(\", \");\n        var fields = [\n            { caption: \"Spell/CastingTime\", value: this.cast },\n            { caption: \"Spell/Range\", value: this.range },\n            { caption: \"Spell/Components\", value: components },\n            { caption: \"Spell/Duration\", value: this.duration },\n        ];\n        output = output.concat(renderFields(fields, true));\n        output.push(\"\");\n        return output.join(\"\\n\");\n    };\n    return Spell;\n}());\nexports.Spell = Spell;\nvar StatBlock = /** @class */ (function () {\n    function StatBlock(size, type, alignment, ac, hp, speed, str, dex, con, int, wis, cha, senses, languages, challenge, tags, saves, skills, dimm, dres, dvul, cimm, cres, cvul) {\n        this.size = size;\n        this.type = type;\n        this.alignment = alignment;\n        this.ac = ac;\n        this.hp = hp;\n        this.speed = speed;\n        this.str = str;\n        this.dex = dex;\n        this.con = con;\n        this.int = int;\n        this.wis = wis;\n        this.cha = cha;\n        this.senses = senses;\n        this.languages = languages;\n        this.challenge = challenge;\n        this.tags = tags;\n        this.saves = saves;\n        this.skills = skills;\n        this.dimm = dimm;\n        this.dres = dres;\n        this.dvul = dvul;\n        this.cimm = cimm;\n        this.cres = cres;\n        this.cvul = cvul;\n    }\n    Object.defineProperty(StatBlock.prototype, \"description\", {\n        get: function () {\n            // TODO: Translate stored size, type values in description.\n            var descriptionFragments = [this.size, this.type];\n            if (this.tags) {\n                descriptionFragments.push(this.renderTags(this.tags));\n            }\n            var description = descriptionFragments.join(\" \").trim();\n            if (this.alignment) {\n                description = description + \", \" + this.alignment;\n            }\n            return description;\n        },\n        enumerable: false,\n        configurable: true\n    });\n    StatBlock.prototype.render = function () {\n        var output = [\n            \"//\" + capitalize(this.description) + \"//\",\n            \"\",\n        ];\n        var fields = [\n            { caption: \"StatBlock/AC\", value: this.ac },\n            { caption: \"StatBlock/HP\", value: average(this.hp) },\n            { caption: \"StatBlock/Speed\", value: this.speed },\n        ];\n        output = output.concat(renderFields(fields, true));\n        output.push(\"\");\n        output.push(\"---\");\n        var abilities = [\n            { caption: \"StatBlock/STR\", value: this.str },\n            { caption: \"StatBlock/DEX\", value: this.dex },\n            { caption: \"StatBlock/CON\", value: this.con },\n            { caption: \"StatBlock/INT\", value: this.int },\n            { caption: \"StatBlock/WIS\", value: this.wis },\n            { caption: \"StatBlock/CHA\", value: this.cha },\n        ];\n        output = output.concat(this.renderAbilities(abilities));\n        output.push(\"\");\n        output.push(\"---\");\n        fields = [\n            { caption: \"StatBlock/Saves\", value: this.saves },\n            { caption: \"StatBlock/Skills\", value: this.skills },\n            { caption: \"StatBlock/DamageImmunities\", value: this.dimm },\n            { caption: \"StatBlock/DamageResistances\", value: this.dres },\n            { caption: \"StatBlock/DamageVulnerabilities\", value: this.dvul },\n            { caption: \"StatBlock/ConditionImmunities\", value: this.cimm },\n            { caption: \"StatBlock/ConditionResistances\", value: this.cres },\n            { caption: \"StatBlock/ConditionVulnerabilities\", value: this.cvul },\n        ];\n        output = output.concat(renderFields(fields, false));\n        // Does the challenge field embed XP?\n        var challengeRegexp = /(\\d+)\\s+(\\d+)?/;\n        var challengeMatch = this.challenge.match(challengeRegexp);\n        var challengeMacro = \"<<dnd.xp \\\"\" + this.challenge + \"\\\">>\";\n        if (challengeMatch && challengeMatch[2]) {\n            challengeMacro = \"<<dnd.xp \\\"\" + challengeMatch[1] + \"\\\" \\\"\" + challengeMatch[2] + \"\\\">>\";\n        }\n        fields = [\n            { caption: \"StatBlock/Senses\", value: this.senses },\n            { caption: \"StatBlock/Languages\", value: this.languages },\n            { caption: \"StatBlock/Challenge\", value: challengeMacro },\n        ];\n        output = output.concat(renderFields(fields, true));\n        output.push(\"\");\n        output.push(\"---\");\n        return output.join(\"\\n\");\n    };\n    StatBlock.prototype.renderTags = function (tags) {\n        return tags ? \"(\" + tags + \")\" : \"\";\n    };\n    StatBlock.prototype.renderAbilities = function (abilities) {\n        return [\n            \"| \" + abilities.map(function (field) { return \"<<dnd._lingo \" + field.caption + \">>\"; }).join(\" | \") + \" |h\",\n            \"| \" + abilities.map(function (field) { return ability(field.value); }).join(\" | \") + \" |\",\n        ];\n    };\n    return StatBlock;\n}());\nexports.StatBlock = StatBlock;\nfunction ability(score) {\n    return score + \" (\" + modifier(score) + \")\";\n}\nexports.ability = ability;\nfunction modifier(score) {\n    var mod = Math.floor((score - 10) / 2);\n    var op = (mod >= 0) ? \"+\" : \"−\"; // minus sign (U+2212)\n    return \"\" + op + Math.abs(mod);\n}\nexports.modifier = modifier;\nfunction average(expr) {\n    var regexp = /(\\d+)?d(\\d+)\\s?(?:(-|\\+)\\s?(\\d+))?/i;\n    var match = expr.match(regexp);\n    if (!match) {\n        return expr;\n    }\n    var nDice = parseInt(match[1], 10) || 1;\n    var nSides = parseInt(match[2], 10);\n    var op = match[3];\n    var mod = parseInt(match[4], 10) || 0;\n    var avg;\n    if (!op) {\n        avg = Math.floor(nDice * (1 + nSides) / 2 + mod);\n        return avg + \" (\" + nDice + \"d\" + nSides + \")\";\n    }\n    if (op === \"+\") {\n        avg = Math.floor(nDice * (1 + nSides) / 2 + mod);\n    }\n    else {\n        op = \"−\";\n        avg = Math.floor(nDice * (1 + nSides) / 2 - mod);\n    }\n    return avg + \" (\" + nDice + \"d\" + nSides + \" \" + op + \" \" + mod + \")\";\n}\nexports.average = average;\nfunction capitalize(s) {\n    return s.charAt(0).toLocaleUpperCase() + s.slice(1);\n}\nexports.capitalize = capitalize;\n// tslint:disable-next-line:no-shadowed-variable\nfunction check(ability, skill, dc) {\n    var abilityMatch = ability.match(ABILITY_REGEX);\n    if (!abilityMatch) {\n        return \"\";\n    }\n    var abilityCode = abilityMatch[1].toLocaleUpperCase();\n    var fragments = [\"<<dnd._lingo Ability/\" + abilityCode + \">>\"];\n    if (skill) {\n        var skillMatch = skill.match(SKILL_REGEX);\n        if (skillMatch) {\n            var skillCode = skillMatch[1].toLocaleLowerCase();\n            fragments.push(\"(<<dnd._lingo Skill/\" + SKILL_CODES_TO_CAPTIONS[skillCode] + \">>)\");\n        }\n    }\n    if (dc) {\n        fragments.unshift(\"<<dnd._lingo Check/DC>> \" + dc);\n    }\n    return fragments.join(\" \");\n}\nexports.check = check;\nfunction renderFields(fields, alwaysRender) {\n    var output = [];\n    for (var _i = 0, fields_1 = fields; _i < fields_1.length; _i++) {\n        var field = fields_1[_i];\n        if (alwaysRender || field.value) {\n            output.push(\"|!<<dnd._lingo \" + field.caption + \">> |\" + field.value + \" |\");\n        }\n    }\n    return output;\n}\nfunction getXP(rating) {\n    rating = rating.replace(/['\"]/g, \"\");\n    return CR_TO_XP[rating];\n}\nexports.getXP = getXP;\nfunction hit(damage, damageType, extraDamage, extraDamageType, condDamage, condDamageType, extraCondDamage, extraCondDamageType, when, effect) {\n    var buffer = [\"//<<dnd._lingo StatBlock/Action/Hit>>://\"];\n    buffer.push(renderDamage(damage, damageType, extraDamage, extraDamageType));\n    var or = \"\";\n    if (condDamage && condDamageType && when) {\n        or = renderDamage(condDamage, condDamageType, extraCondDamage, extraCondDamageType) + \" \" + when;\n    }\n    var output = buffer.join(\" \");\n    if (or) {\n        output = output + \", <<dnd._lingo StatBlock/Action/Or>> \" + or;\n    }\n    if (effect) {\n        output = output + \", \" + effect;\n    }\n    return output + \".\";\n}\nexports.hit = hit;\nfunction renderDamage(damage, damageType, extraDamage, extraDamageType) {\n    var buffer = [\n        average(damage),\n        damageType,\n    ];\n    if (extraDamage && extraDamageType) {\n        buffer = buffer.concat([\n            \"<<dnd._lingo StatBlock/Action/Plus>>\",\n            average(extraDamage),\n            extraDamageType,\n        ]);\n    }\n    return buffer.join(\" \");\n}\nfunction weaponAttack(attackType, bonus, reach, range, target) {\n    var _a;\n    // tslint:disable max-line-length\n    var attackTypesToCaptions = (_a = {},\n        _a[AttackType.Melee] = {\n            attack: \"<<dnd._lingo StatBlock/Action/Melee>>\",\n            reachOrRange: \"<<dnd._lingo StatBlock/Action/Reach>> \" + reach,\n        },\n        _a[AttackType.Ranged] = {\n            attack: \"<<dnd._lingo StatBlock/Action/Ranged>>\",\n            reachOrRange: \"<<dnd._lingo StatBlock/Action/Range>> \" + range,\n        },\n        _a[AttackType.MeleeOrRanged] = {\n            attack: \"<<dnd._lingo StatBlock/Action/MeleeOrRanged>>\",\n            reachOrRange: \"<<dnd._lingo StatBlock/Action/Reach>> \" + reach + \" <<dnd._lingo StatBlock/Action/Or>> <<dnd._lingo StatBlock/Action/Range>> \" + range,\n        },\n        _a);\n    var captions = attackTypesToCaptions[attackType];\n    var output = [\n        \"//\" + captions.attack + \":// \" + bonus + \" <<dnd._lingo StatBlock/Action/ToHit>>\",\n        captions.reachOrRange,\n        target || \"<<dnd._lingo StatBlock/Action/DefaultTarget>>\",\n    ];\n    return output.join(\", \") + \".\";\n}\nexports.weaponAttack = weaponAttack;\n",
+            "title": "$:/plugins/benwebber/dnd/dnd.js",
+            "type": "application/javascript",
+            "module-type": "library"
+        },
+        "$:/plugins/benwebber/dnd/icon": {
+            "title": "$:/plugins/benwebber/dnd/icon",
+            "text": "<!--\nd-and-d-brands icon from FontAwesome\nLicensed under Creative Commons Attribution 4.0 International\nhttps://fontawesome.com/license\n-->\n<svg aria-hidden=\"true\" data-prefix=\"fab\" data-icon=\"d-and-d\" class=\"svg-inline--fa fa-d-and-d fa-w-18\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 576 512\"><path fill=\"currentColor\" d=\"M82.5 98.9c-.6-17.2 2-33.8 12.7-48.2.3 7.4 1.2 14.5 4.2 21.6 5.9-27.5 19.7-49.3 42.3-65.5-1.9 5.9-3.5 11.8-3 17.7 8.7-7.4 18.8-17.8 44.4-22.7 14.7-2.8 29.7-2 42.1 1 38.5 9.3 61 34.3 69.7 72.3 5.3 23.1.7 45-8.3 66.4-5.2 12.4-12 24.4-20.7 35.1-2-1.9-3.9-3.8-5.8-5.6-42.8-40.8-26.8-25.2-37.4-37.4-1.1-1.2-1-2.2-.1-3.6 8.3-13.5 11.8-28.2 10-44-1.1-9.8-4.3-18.9-11.3-26.2-14.5-15.3-39.2-15-53.5.6-11.4 12.5-14.1 27.4-10.9 43.6.2 1.3.4 2.7 0 3.9-3.4 13.7-4.6 27.6-2.5 41.6.1.5.1 1.1.1 1.6 0 .3-.1.5-.2 1.1-21.8-11-36-28.3-43.2-52.2-8.3 17.8-11.1 35.5-6.6 54.1-15.6-15.2-21.3-34.3-22-55.2zm469.6 123.2c-11.6-11.6-25-20.4-40.1-26.6-12.8-5.2-26-7.9-39.9-7.1-10 .6-19.6 3.1-29 6.4-2.5.9-5.1 1.6-7.7 2.2-4.9 1.2-7.3-3.1-4.7-6.8 3.2-4.6 3.4-4.2 15-12 .6-.4 1.2-.8 2.2-1.5h-2.5c-.6 0-1.2.2-1.9.3-19.3 3.3-30.7 15.5-48.9 29.6-10.4 8.1-13.8 3.8-12-.5 1.4-3.5 3.3-6.7 5.1-10 1-1.8 2.3-3.4 3.5-5.1-.2-.2-.5-.3-.7-.5-27 18.3-46.7 42.4-57.7 73.3.3.3.7.6 1 .9.3-.6.5-1.2.9-1.7 10.4-12.1 22.8-21.8 36.6-29.8 18.2-10.6 37.5-18.3 58.7-20.2 4.3-.4 8.7-.1 13.1-.1-1.8.7-3.5.9-5.3 1.1-18.5 2.4-35.5 9-51.5 18.5-30.2 17.9-54.5 42.2-75.1 70.4-.3.4-.4.9-.7 1.3 14.5 5.3 24 17.3 36.1 25.6.2-.1.3-.2.4-.4l1.2-2.7c12.2-26.9 27-52.3 46.7-74.5 16.7-18.8 38-25.3 62.5-20 5.9 1.3 11.4 4.4 17.2 6.8 2.3-1.4 5.1-3.2 8-4.7 8.4-4.3 17.4-7 26.7-9 14.7-3.1 29.5-4.9 44.5-1.3v-.5c-.5-.4-1.2-.8-1.7-1.4zM316.7 397.6c-39.4-33-22.8-19.5-42.7-35.6-.8.9 0-.2-1.9 3-11.2 19.1-25.5 35.3-44 47.6-10.3 6.8-21.5 11.8-34.1 11.8-21.6 0-38.2-9.5-49.4-27.8-12-19.5-13.3-40.7-8.2-62.6 7.8-33.8 30.1-55.2 38.6-64.3-18.7-6.2-33 1.7-46.4 13.9.8-13.9 4.3-26.2 11.8-37.3-24.3 10.6-45.9 25-64.8 43.9-.3-5.8 5.4-43.7 5.6-44.7.3-2.7-.6-5.3-3-7.4-24.2 24.7-44.5 51.8-56.1 84.6 7.4-5.9 14.9-11.4 23.6-16.2-8.3 22.3-19.6 52.8-7.8 101.1 4.6 19 11.9 36.8 24.1 52.3 2.9 3.7 6.3 6.9 9.5 10.3.2-.2.4-.3.6-.5-1.4-7-2.2-14.1-1.5-21.9 2.2 3.2 3.9 6 5.9 8.6 12.6 16 28.7 27.4 47.2 35.6 25 11.3 51.1 13.3 77.9 8.6 54.9-9.7 90.7-48.6 116-98.8 1-1.8.6-2.9-.9-4.2zm172-46.4c-9.5-3.1-22.2-4.2-28.7-2.9 9.9 4 14.1 6.6 18.8 12 12.6 14.4 10.4 34.7-5.4 45.6-11.7 8.1-24.9 10.5-38.9 9.1-1.2-.1-2.3-.4-3-.6 2.8-3.7 6-7 8.1-10.8 9.4-16.8 5.4-42.1-8.7-56.1-2.1-2.1-4.6-3.9-7-5.9-.3 1.3-.1 2.1.1 2.8 4.2 16.6-8.1 32.4-24.8 31.8-7.6-.3-13.9-3.8-19.6-8.5-19.5-16.1-39.1-32.1-58.5-48.3-5.9-4.9-12.5-8.1-20.1-8.7-4.6-.4-9.3-.6-13.9-.9-5.9-.4-8.8-2.8-10.4-8.4-.9-3.4-1.5-6.8-2.2-10.2-1.5-8.1-6.2-13-14.3-14.2-4.4-.7-8.9-1-13.3-1.5-13-1.4-19.8-7.4-22.6-20.3-5 11-1.6 22.4 7.3 29.9 4.5 3.8 9.3 7.3 13.8 11.2 4.6 3.8 7.4 8.7 7.9 14.8.4 4.7.8 9.5 1.8 14.1 2.2 10.6 8.9 18.4 17 25.1 16.5 13.7 33 27.3 49.5 41.1 17.9 15 13.9 32.8 13 56-.9 22.9 12.2 42.9 33.5 51.2 1 .4 2 .6 3.6 1.1-15.7-18.2-10.1-44.1.7-52.3.3 2.2.4 4.3.9 6.4 9.4 44.1 45.4 64.2 85 56.9 16-2.9 30.6-8.9 42.9-19.8 2-1.8 3.7-4.1 5.9-6.5-19.3 4.6-35.8.1-50.9-10.6.7-.3 1.3-.3 1.9-.3 21.3 1.8 40.6-3.4 57-17.4 19.5-16.6 26.6-42.9 17.4-66-8.3-20.1-23.6-32.3-43.8-38.9zM99.4 179.3c-5.3-9.2-13.2-15.6-22.1-21.3 13.7-.5 26.6.2 39.6 3.7-7-12.2-8.5-24.7-5-38.7 5.3 11.9 13.7 20.1 23.6 26.8 19.7 13.2 35.7 19.6 46.7 30.2 3.4 3.3 6.3 7.1 9.6 10.9-.8-2.1-1.4-4.1-2.2-6-5-10.6-13-18.6-22.6-25-1.8-1.2-2.8-2.5-3.4-4.5-3.3-12.5-3-25.1-.7-37.6 1-5.5 2.8-10.9 4.5-16.3.8-2.4 2.3-4.6 4-6.6.6 6.9 0 25.5 19.6 46 10.8 11.3 22.4 21.9 33.9 32.7 9 8.5 18.3 16.7 25.5 26.8 1.1 1.6 2.2 3.3 3.8 4.7-5-13-14.2-24.1-24.2-33.8-9.6-9.3-19.4-18.4-29.2-27.4-3.3-3-4.6-6.7-5.1-10.9-1.2-10.4 0-20.6 4.3-30.2.5-1 1.1-2 1.9-3.3.5 4.2.6 7.9 1.4 11.6 4.8 23.1 20.4 36.3 49.3 63.5 10 9.4 19.3 19.2 25.6 31.6 4.8 9.3 7.3 19 5.7 29.6-.1.6.5 1.7 1.1 2 6.2 2.6 10 6.9 9.7 14.3 7.7-2.6 12.5-8 16.4-14.5 4.2 20.2-9.1 50.3-27.2 58.7.4-4.5 5-23.4-16.5-27.7-6.8-1.3-12.8-1.3-22.9-2.1 4.7-9 10.4-20.6.5-22.4-24.9-4.6-52.8 1.9-57.8 4.6 8.2.4 16.3 1 23.5 3.3-2 6.5-4 12.7-5.8 18.9-1.9 6.5 2.1 14.6 9.3 9.6 1.2-.9 2.3-1.9 3.3-2.7-3.1 17.9-2.9 15.9-2.8 18.3.3 10.2 9.5 7.8 15.7 7.3-2.5 11.8-29.5 27.3-45.4 25.8 7-4.7 12.7-10.3 15.9-17.9-6.5.8-12.9 1.6-19.2 2.4l-.3-.9c4.7-3.4 8-7.8 10.2-13.1 8.7-21.1-3.6-38-25-39.9-9.1-.8-17.8.8-25.9 5.5 6.2-15.6 17.2-26.6 32.6-34.5-15.2-4.3-8.9-2.7-24.6-6.3 14.6-9.3 30.2-13.2 46.5-14.6-5.2-3.2-48.1-3.6-70.2 20.9 7.9 1.4 15.5 2.8 23.2 4.2-23.8 7-44 19.7-62.4 35.6 1.1-4.8 2.7-9.5 3.3-14.3.6-4.5.8-9.2.1-13.6-1.5-9.4-8.9-15.1-19.7-16.3-7.9-.9-15.6.1-23.3 1.3-.9.1-1.7.3-2.9 0 15.8-14.8 36-21.7 53.1-33.5 6-4.5 6.8-8.2 3-14.9zm128.4 26.8c3.3 16 12.6 25.5 23.8 24.3-4.6-11.3-12.1-19.5-23.8-24.3z\"></path></svg>\n"
+        },
+        "$:/plugins/benwebber/dnd/images/add-note": {
+            "title": "$:/plugins/benwebber/dnd/images/add-note",
+            "text": "<!--\n  sticky-note icon from FontAwesome\n  Licensed under Creative Commons Attribution 4.0 International\n  https://fontawesome.com/license\n\n  Modified by removing fill and setting TiddlyWiki classes, height, and width.\n-->\n<svg aria-hidden=\"true\" focusable=\"false\" data-prefix=\"far\" data-icon=\"sticky-note\" class=\"tc-image-button\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\" width=\"22pt\" height=\"22pt\"><path d=\"M448 348.106V80c0-26.51-21.49-48-48-48H48C21.49 32 0 53.49 0 80v351.988c0 26.51 21.49 48 48 48h268.118a48 48 0 0 0 33.941-14.059l83.882-83.882A48 48 0 0 0 448 348.106zm-128 80v-76.118h76.118L320 428.106zM400 80v223.988H296c-13.255 0-24 10.745-24 24v104H48V80h352z\"></path></svg>\n"
+        },
+        "$:/plugins/benwebber/dnd/images/edit-attributes": {
+            "title": "$:/plugins/benwebber/dnd/images/edit-attributes",
+            "text": "<!--\n  slider-h icon from FontAwesome\n  Licensed under Creative Commons Attribution 4.0 International\n  https://fontawesome.com/license\n\n  Modified by removing fill and setting TiddlyWiki classes, height, and width.\n-->\n<svg aria-hidden=\"true\" focusable=\"false\" data-prefix=\"fas\" data-icon=\"sliders-h\" class=\"tc-image-button\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" width=\"22pt\" height=\"22pt\"><path d=\"M496 384H160v-16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v16H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h80v16c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-16h336c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm0-160h-80v-16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v16H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h336v16c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-16h80c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm0-160H288V48c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v16H16C7.2 64 0 71.2 0 80v32c0 8.8 7.2 16 16 16h208v16c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-16h208c8.8 0 16-7.2 16-16V80c0-8.8-7.2-16-16-16z\"></path></svg>\n"
+        },
+        "$:/plugins/benwebber/dnd/images/export-player-edition": {
+            "title": "$:/plugins/benwebber/dnd/images/export-player-edition",
+            "text": "<!--\n  file-export-solid icon from FontAwesome\n  Licensed under Creative Commons Attribution 4.0 International\n  https://fontawesome.com/license\n\n  Modified by removing fill and setting TiddlyWiki classes, height, and width.\n-->\n<svg aria-hidden=\"true\" focusable=\"false\" data-prefix=\"fas\" data-icon=\"file-export\" class=\"tc-image-button\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 576 512\" width=\"22pt\" height=\"22pt\"><path d=\"M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z\"></path></svg>\n"
+        },
+        "$:/plugins/benwebber/dnd/images/new-character": {
+            "title": "$:/plugins/benwebber/dnd/images/new-character",
+            "text": "<!--\n  user-plus-solid icon from FontAwesome\n  Licensed under Creative Commons Attribution 4.0 International\n  https://fontawesome.com/license\n\n  Modified by removing fill and setting TiddlyWiki classes, height, and width.\n-->\n<svg aria-hidden=\"true\" data-prefix=\"fas\" data-icon=\"user-plus\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 512\" class=\"tc-image-button\" width=\"22pt\" height=\"22pt\"><path d=\"M624 208h-64v-64c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v64h-64c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h64v64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-64h64c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm-400 48c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z\"></path></svg>\n"
+        },
+        "$:/plugins/benwebber/dnd/images/new-creature": {
+            "title": "$:/plugins/benwebber/dnd/images/new-creature",
+            "text": "<!--\n  dragon-solid icon from FontAwesome\n  Licensed under Creative Commons Attribution 4.0 International\n  https://fontawesome.com/license\n\n  Modified by removing fill and setting TiddlyWiki classes, height, and width.\n-->\n<svg aria-hidden=\"true\" focusable=\"false\" data-prefix=\"fas\" data-icon=\"dragon\" class=\"tc-image-button\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 512\" width=\"22pt\" height=\"22pt\"><path d=\"M18.32 255.78L192 223.96l-91.28 68.69c-10.08 10.08-2.94 27.31 11.31 27.31h222.7c-9.44-26.4-14.73-54.47-14.73-83.38v-42.27l-119.73-87.6c-23.82-15.88-55.29-14.01-77.06 4.59L5.81 227.64c-12.38 10.33-3.45 30.42 12.51 28.14zm556.87 34.1l-100.66-50.31A47.992 47.992 0 0 1 448 196.65v-36.69h64l28.09 22.63c6 6 14.14 9.37 22.63 9.37h30.97a32 32 0 0 0 28.62-17.69l14.31-28.62a32.005 32.005 0 0 0-3.02-33.51l-74.53-99.38C553.02 4.7 543.54 0 533.47 0H296.02c-7.13 0-10.7 8.57-5.66 13.61L352 63.96 292.42 88.8c-5.9 2.95-5.9 11.36 0 14.31L352 127.96v108.62c0 72.08 36.03 139.39 96 179.38-195.59 6.81-344.56 41.01-434.1 60.91C5.78 478.67 0 485.88 0 494.2 0 504 7.95 512 17.76 512h499.08c63.29.01 119.61-47.56 122.99-110.76 2.52-47.28-22.73-90.4-64.64-111.36zM489.18 66.25l45.65 11.41c-2.75 10.91-12.47 18.89-24.13 18.26-12.96-.71-25.85-12.53-21.52-29.67z\"></path></svg>\n"
+        },
+        "$:/plugins/benwebber/dnd/images/new-spell": {
+            "title": "$:/plugins/benwebber/dnd/images/new-spell",
+            "text": "<!--\n  magic icon from FontAwesome\n  Licensed under Creative Commons Attribution 4.0 International\n  https://fontawesome.com/license\n\n  Modified by removing fill and setting TiddlyWiki classes, height, and width.\n-->\n<svg aria-hidden=\"true\" data-prefix=\"fas\" data-icon=\"magic\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" class=\"tc-image-button\" width=\"22pt\" height=\"22pt\"><path d=\"M224 96l16-32 32-16-32-16-16-32-16 32-32 16 32 16 16 32zM80 160l26.66-53.33L160 80l-53.34-26.67L80 0 53.34 53.33 0 80l53.34 26.67L80 160zm352 128l-26.66 53.33L352 368l53.34 26.67L432 448l26.66-53.33L512 368l-53.34-26.67L432 288zm70.62-193.77L417.77 9.38C411.53 3.12 403.34 0 395.15 0c-8.19 0-16.38 3.12-22.63 9.38L9.38 372.52c-12.5 12.5-12.5 32.76 0 45.25l84.85 84.85c6.25 6.25 14.44 9.37 22.62 9.37 8.19 0 16.38-3.12 22.63-9.37l363.14-363.15c12.5-12.48 12.5-32.75 0-45.24zM359.45 203.46l-50.91-50.91 86.6-86.6 50.91 50.91-86.6 86.6z\"></path></svg>\n"
+        },
+        "$:/plugins/benwebber/dnd/images/private": {
+            "title": "$:/plugins/benwebber/dnd/images/private",
+            "text": "<!--\n  eye-slash icon from FontAwesome\n  Licensed under Creative Commons Attribution 4.0 International\n  https://fontawesome.com/license\n\n  Modified by removing fill and setting TiddlyWiki classes, height, and width.\n-->\n<svg aria-hidden=\"true\" focusable=\"false\" data-prefix=\"fas\" data-icon=\"eye-slash\" class=\"tc-image-button\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 512\" width=\"22pt\" height=\"22pt\"><path d=\"M320 400c-75.85 0-137.25-58.71-142.9-133.11L72.2 185.82c-13.79 17.3-26.48 35.59-36.72 55.59a32.35 32.35 0 0 0 0 29.19C89.71 376.41 197.07 448 320 448c26.91 0 52.87-4 77.89-10.46L346 397.39a144.13 144.13 0 0 1-26 2.61zm313.82 58.1l-110.55-85.44a331.25 331.25 0 0 0 81.25-102.07 32.35 32.35 0 0 0 0-29.19C550.29 135.59 442.93 64 320 64a308.15 308.15 0 0 0-147.32 37.7L45.46 3.37A16 16 0 0 0 23 6.18L3.37 31.45A16 16 0 0 0 6.18 53.9l588.36 454.73a16 16 0 0 0 22.46-2.81l19.64-25.27a16 16 0 0 0-2.82-22.45zm-183.72-142l-39.3-30.38A94.75 94.75 0 0 0 416 256a94.76 94.76 0 0 0-121.31-92.21A47.65 47.65 0 0 1 304 192a46.64 46.64 0 0 1-1.54 10l-73.61-56.89A142.31 142.31 0 0 1 320 112a143.92 143.92 0 0 1 144 144c0 21.63-5.29 41.79-13.9 60.11z\"></path></svg>\n"
+        },
+        "$:/plugins/benwebber/dnd/images/public": {
+            "title": "$:/plugins/benwebber/dnd/images/public",
+            "text": "<!--\n  eye icon from FontAwesome\n  Licensed under Creative Commons Attribution 4.0 International\n  https://fontawesome.com/license\n\n  Modified by removing fill and setting TiddlyWiki classes, height, and width.\n-->\n<svg aria-hidden=\"true\" focusable=\"false\" data-prefix=\"fas\" data-icon=\"eye\" class=\"tc-image-button\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 576 512\" width=\"22pt\" height=\"22pt\"><path d=\"M572.52 241.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400a144 144 0 1 1 144-144 143.93 143.93 0 0 1-144 144zm0-240a95.31 95.31 0 0 0-25.31 3.79 47.85 47.85 0 0 1-66.9 66.9A95.78 95.78 0 1 0 288 160z\"></path></svg>\n"
+        },
+        "$:/plugins/benwebber/dnd/language/Ability/STR": {
+            "title": "$:/plugins/benwebber/dnd/language/Ability/STR",
+            "text": "Strength"
+        },
+        "$:/plugins/benwebber/dnd/language/Ability/DEX": {
+            "title": "$:/plugins/benwebber/dnd/language/Ability/DEX",
+            "text": "Dexterity"
+        },
+        "$:/plugins/benwebber/dnd/language/Ability/CON": {
+            "title": "$:/plugins/benwebber/dnd/language/Ability/CON",
+            "text": "Constitution"
+        },
+        "$:/plugins/benwebber/dnd/language/Ability/INT": {
+            "title": "$:/plugins/benwebber/dnd/language/Ability/INT",
+            "text": "Intelligence"
+        },
+        "$:/plugins/benwebber/dnd/language/Ability/WIS": {
+            "title": "$:/plugins/benwebber/dnd/language/Ability/WIS",
+            "text": "Wisdom"
+        },
+        "$:/plugins/benwebber/dnd/language/Ability/CHA": {
+            "title": "$:/plugins/benwebber/dnd/language/Ability/CHA",
+            "text": "Charisma"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/AddNote/Text": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/AddNote/Text",
+            "text": "add note"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/AddNote/Tooltip": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/AddNote/Tooltip",
+            "text": "Add a note to this tiddler"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/DeleteNote/Text": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/DeleteNote/Text",
+            "text": "Delete this note"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/EditNote/Text": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/EditNote/Text",
+            "text": "Edit this note"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/EditAttributes/Text": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/EditAttributes/Text",
+            "text": "edit attributes"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/EditAttributes/Tooltip": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/EditAttributes/Tooltip",
+            "text": "Edit this tiddler's game attributes"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/ExportPlayerEdition/Text": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/ExportPlayerEdition/Text",
+            "text": "export player edition"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/ExportPlayerEdition/Tooltip": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/ExportPlayerEdition/Tooltip",
+            "text": "Export player edition"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/NewCharacter/Text": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/NewCharacter/Text",
+            "text": "new character"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/NewCharacter/Title": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/NewCharacter/Title",
+            "text": "New Character"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/NewCharacter/Tooltip": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/NewCharacter/Tooltip",
+            "text": "Create a new character"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/NewCreature/Text": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/NewCreature/Text",
+            "text": "new creature"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/NewCreature/Title": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/NewCreature/Title",
+            "text": "New Creature"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/NewCreature/Tooltip": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/NewCreature/Tooltip",
+            "text": "Create a new creature"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/NewSpell/Text": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/NewSpell/Text",
+            "text": "new spell"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/NewSpell/Title": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/NewSpell/Title",
+            "text": "New Spell"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/NewSpell/Tooltip": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/NewSpell/Tooltip",
+            "text": "Create a new spell"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/PlayerEdition/Description": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/PlayerEdition/Description",
+            "text": "Choose whether to export this tiddler in the player edition"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/PlayerEdition/Text": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/PlayerEdition/Text",
+            "text": "player edition"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/Private/Text": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/Private/Text",
+            "text": "private"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/Private/Tooltip": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/Private/Tooltip",
+            "text": "This tiddler is private. Click to make it public."
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/Public/Text": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/Public/Text",
+            "text": "public"
+        },
+        "$:/plugins/benwebber/dnd/language/Buttons/Public/Tooltip": {
+            "title": "$:/plugins/benwebber/dnd/language/Buttons/Public/Tooltip",
+            "text": "This tiddler is public. Click to make it private."
+        },
+        "$:/plugins/benwebber/dnd/language/Check/DC": {
+            "title": "$:/plugins/benwebber/dnd/language/Check/DC",
+            "text": "DC"
+        },
+        "$:/plugins/benwebber/dnd/language/EditCurrentTiddler": {
+            "title": "$:/plugins/benwebber/dnd/language/EditCurrentTiddler",
+            "text": "Edit <<sourceTiddler>> attributes"
+        },
+        "$:/plugins/benwebber/dnd/language/Character/Alignment": {
+            "title": "$:/plugins/benwebber/dnd/language/Character/Alignment",
+            "text": "Alignment"
+        },
+        "$:/plugins/benwebber/dnd/language/Character/Class": {
+            "title": "$:/plugins/benwebber/dnd/language/Character/Class",
+            "text": "Class"
+        },
+        "$:/plugins/benwebber/dnd/language/Character/Factions": {
+            "title": "$:/plugins/benwebber/dnd/language/Character/Factions",
+            "text": "Factions"
+        },
+        "$:/plugins/benwebber/dnd/language/Character/Languages": {
+            "title": "$:/plugins/benwebber/dnd/language/Character/Languages",
+            "text": "Languages"
+        },
+        "$:/plugins/benwebber/dnd/language/Character/Race": {
+            "title": "$:/plugins/benwebber/dnd/language/Character/Race",
+            "text": "Race"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Size/Tiny": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Size/Tiny",
+            "text": "Tiny"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Size/Small": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Size/Small",
+            "text": "Small"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Size/Medium": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Size/Medium",
+            "text": "Medium"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Size/Large": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Size/Large",
+            "text": "Large"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Size/Huge": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Size/Huge",
+            "text": "Huge"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Size/Gargantuan": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Size/Gargantuan",
+            "text": "Gargantuan"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Aberration": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Aberration",
+            "text": "Aberration"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Beast": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Beast",
+            "text": "Beast"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Celestial": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Celestial",
+            "text": "Celestial"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Construct": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Construct",
+            "text": "Construct"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Dragon": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Dragon",
+            "text": "Dragon"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Elemental": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Elemental",
+            "text": "Elemental"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Fey": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Fey",
+            "text": "Fey"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Fiend": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Fiend",
+            "text": "Fiend"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Giant": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Giant",
+            "text": "Giant"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Humanoid": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Humanoid",
+            "text": "Humanoid"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Monstrosity": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Monstrosity",
+            "text": "Monstrosity"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Ooze": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Ooze",
+            "text": "Ooze"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Plant": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Plant",
+            "text": "Plant"
+        },
+        "$:/plugins/benwebber/dnd/language/Creature/Type/Undead": {
+            "title": "$:/plugins/benwebber/dnd/language/Creature/Type/Undead",
+            "text": "Undead"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Acid": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Acid",
+            "text": "acid damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Bludgeoning": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Bludgeoning",
+            "text": "bludgeoning damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Cold": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Cold",
+            "text": "cold damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Fire": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Fire",
+            "text": "fire damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Force": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Force",
+            "text": "force damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Lightning": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Lightning",
+            "text": "lightning damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Necrotic": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Necrotic",
+            "text": "necrotic damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Piercing": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Piercing",
+            "text": "piercing damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Poison": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Poison",
+            "text": "poison damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Psychic": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Psychic",
+            "text": "psychic damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Radiant": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Radiant",
+            "text": "radiant damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Slashing": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Slashing",
+            "text": "slashing damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Damage/Type/Thunder": {
+            "title": "$:/plugins/benwebber/dnd/language/Damage/Type/Thunder",
+            "text": "thunder damage"
+        },
+        "$:/plugins/benwebber/dnd/language/Modals/Subtitle": {
+            "title": "$:/plugins/benwebber/dnd/language/Modals/Subtitle",
+            "text": "Editing <<tiddler>>"
+        },
+        "$:/plugins/benwebber/dnd/language/Modals/Help": {
+            "title": "$:/plugins/benwebber/dnd/language/Modals/Help",
+            "text": "//Changes take effect immediately.//"
+        },
+        "$:/plugins/benwebber/dnd/language/Settings/Version": {
+            "title": "$:/plugins/benwebber/dnd/language/Settings/Version",
+            "text": "Version"
+        },
+        "$:/plugins/benwebber/dnd/language/Settings/CharacterTag": {
+            "title": "$:/plugins/benwebber/dnd/language/Settings/CharacterTag",
+            "text": "Tag for character tiddlers"
+        },
+        "$:/plugins/benwebber/dnd/language/Settings/CreatureTag": {
+            "title": "$:/plugins/benwebber/dnd/language/Settings/CreatureTag",
+            "text": "Tag for creature tiddlers"
+        },
+        "$:/plugins/benwebber/dnd/language/Settings/NoteTag": {
+            "title": "$:/plugins/benwebber/dnd/language/Settings/NoteTag",
+            "text": "Tag for note tiddlers"
+        },
+        "$:/plugins/benwebber/dnd/language/Settings/PlayerEditionTag": {
+            "title": "$:/plugins/benwebber/dnd/language/Settings/PlayerEditionTag",
+            "text": "Tag for public tiddlers (exported with player edition)"
+        },
+        "$:/plugins/benwebber/dnd/language/Settings/SpellTag": {
+            "title": "$:/plugins/benwebber/dnd/language/Settings/SpellTag",
+            "text": "Tag for spell tiddlers"
+        },
+        "$:/plugins/benwebber/dnd/language/Settings/RenderCharacters": {
+            "title": "$:/plugins/benwebber/dnd/language/Settings/RenderCharacters",
+            "text": "Automatically render character frontmatter for character tiddlers"
+        },
+        "$:/plugins/benwebber/dnd/language/Settings/RenderCreatures": {
+            "title": "$:/plugins/benwebber/dnd/language/Settings/RenderCreatures",
+            "text": "Automatically render stat blocks for creature tiddlers"
+        },
+        "$:/plugins/benwebber/dnd/language/Settings/RenderNotes": {
+            "title": "$:/plugins/benwebber/dnd/language/Settings/RenderNotes",
+            "text": "Show notes"
+        },
+        "$:/plugins/benwebber/dnd/language/Settings/RenderSpells": {
+            "title": "$:/plugins/benwebber/dnd/language/Settings/RenderSpells",
+            "text": "Automatically render stat blocks for spell tiddlers"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Acrobatics": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Acrobatics",
+            "text": "Acrobatics"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/AnimalHandling": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/AnimalHandling",
+            "text": "Animal Handling"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Arcana": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Arcana",
+            "text": "Arcana"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Athletics": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Athletics",
+            "text": "Athletics"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Deception": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Deception",
+            "text": "Deception"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/History": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/History",
+            "text": "History"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Insight": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Insight",
+            "text": "Insight"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Intimidation": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Intimidation",
+            "text": "Intimidation"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Investigation": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Investigation",
+            "text": "Investigation"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Medicine": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Medicine",
+            "text": "Medicine"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Nature": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Nature",
+            "text": "Nature"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Perception": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Perception",
+            "text": "Perception"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Performance": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Performance",
+            "text": "Performance"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Persuasion": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Persuasion",
+            "text": "Persuasion"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Religion": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Religion",
+            "text": "Religion"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/SleightOfHand": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/SleightOfHand",
+            "text": "Sleight of Hand"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Stealth": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Stealth",
+            "text": "Stealth"
+        },
+        "$:/plugins/benwebber/dnd/language/Skill/Survival": {
+            "title": "$:/plugins/benwebber/dnd/language/Skill/Survival",
+            "text": "Survival"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/DescriptionFormat/Default": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/DescriptionFormat/Default",
+            "text": "$level$ $school$"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/DescriptionFormat/Ritual": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/DescriptionFormat/Ritual",
+            "text": "$level$ $school$ (ritual)"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/DescriptionFormat/Cantrip": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/DescriptionFormat/Cantrip",
+            "text": "$School$ cantrip"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Level": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Level",
+            "text": "Level"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Level/1": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Level/1",
+            "text": "1st-level"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Level/2": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Level/2",
+            "text": "2nd-level"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Level/3": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Level/3",
+            "text": "3rd-level"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Level/4": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Level/4",
+            "text": "4th-level"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Level/5": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Level/5",
+            "text": "5th-level"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Level/6": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Level/6",
+            "text": "6th-level"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Level/7": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Level/7",
+            "text": "7th-level"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Level/8": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Level/8",
+            "text": "8th-level"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Level/9": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Level/9",
+            "text": "9th-level"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/School": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/School",
+            "text": "School"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/CastingTime": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/CastingTime",
+            "text": "Casting Time"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Range": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Range",
+            "text": "Range"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Duration": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Duration",
+            "text": "Duration"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Components": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Components",
+            "text": "Components"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/School/Abjuration": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/School/Abjuration",
+            "text": "Abjuration"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/School/Conjuration": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/School/Conjuration",
+            "text": "Conjuration"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/School/Divination": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/School/Divination",
+            "text": "Divination"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/School/Enchantment": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/School/Enchantment",
+            "text": "Enchantment"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/School/Evocation": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/School/Evocation",
+            "text": "Evocation"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/School/Illusion": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/School/Illusion",
+            "text": "Illusion"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/School/Necromancy": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/School/Necromancy",
+            "text": "Necromancy"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/School/Transmutation": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/School/Transmutation",
+            "text": "Transmutation"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Ritual": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Ritual",
+            "text": "Ritual"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Verbal": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Verbal",
+            "text": "V"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Somatic": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Somatic",
+            "text": "S"
+        },
+        "$:/plugins/benwebber/dnd/language/Spell/Material": {
+            "title": "$:/plugins/benwebber/dnd/language/Spell/Material",
+            "text": "M"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Size": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Size",
+            "text": "Size"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Type": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Type",
+            "text": "Type"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Tags": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Tags",
+            "text": "Tags"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Alignment": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Alignment",
+            "text": "Alignment"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/AC": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/AC",
+            "text": "Armour Class"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/HP": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/HP",
+            "text": "Hit Points"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Speed": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Speed",
+            "text": "Speed"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/STR": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/STR",
+            "text": "STR"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/DEX": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/DEX",
+            "text": "DEX"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/CON": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/CON",
+            "text": "CON"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/INT": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/INT",
+            "text": "INT"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/WIS": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/WIS",
+            "text": "WIS"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/CHA": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/CHA",
+            "text": "CHA"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/SavingThrows": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/SavingThrows",
+            "text": "Saving Throws"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Senses": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Senses",
+            "text": "Senses"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Languages": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Languages",
+            "text": "Languages"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Challenge": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Challenge",
+            "text": "Challenge"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Saves": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Saves",
+            "text": "Saving Throws"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Skills": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Skills",
+            "text": "Skills"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/DamageImmunities": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/DamageImmunities",
+            "text": "Damage Immunities"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/DamageResistances": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/DamageResistances",
+            "text": "Damage Resistances"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/DamageVulnerabilities": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/DamageVulnerabilities",
+            "text": "Damage Vulnerabilities"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/ConditionImmunities": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/ConditionImmunities",
+            "text": "Condition Immunities"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/ConditionResistances": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/ConditionResistances",
+            "text": "Condition Resistances"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/ConditionVulnerabilities": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/ConditionVulnerabilities",
+            "text": "Condition Vulnerabilities"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Action/Damage": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Action/Damage",
+            "text": "damage"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Action/DefaultTarget": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Action/DefaultTarget",
+            "text": "one target"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Action/Hit": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Action/Hit",
+            "text": "Hit"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Action/Melee": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Action/Melee",
+            "text": "Melee Weapon Attack"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Action/MeleeOrRanged": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Action/MeleeOrRanged",
+            "text": "Melee or Ranged Weapon Attack"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Action/Or": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Action/Or",
+            "text": "or"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Action/Plus": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Action/Plus",
+            "text": "plus"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Action/Range": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Action/Range",
+            "text": "range"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Action/Ranged": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Action/Ranged",
+            "text": "Ranged Weapon Attack"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Action/Reach": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Action/Reach",
+            "text": "reach"
+        },
+        "$:/plugins/benwebber/dnd/language/StatBlock/Action/ToHit": {
+            "title": "$:/plugins/benwebber/dnd/language/StatBlock/Action/ToHit",
+            "text": "to hit"
+        },
+        "$:/plugins/benwebber/dnd/language/XP": {
+            "title": "$:/plugins/benwebber/dnd/language/XP",
+            "text": "XP"
+        },
+        "$:/plugins/benwebber/dnd/languages/en-US/StatBlock/AC": {
+            "title": "$:/plugins/benwebber/dnd/languages/en-US/StatBlock/AC",
+            "text": "Armor Class"
+        },
+        "$:/plugins/benwebber/dnd/macros/character": {
+            "title": "$:/plugins/benwebber/dnd/macros/character",
+            "tags": "$:/tags/Macro",
+            "text": "\\define dnd.character()\n{{||$:/plugins/benwebber/dnd/templates/dnd.character}}\n\\end\n"
+        },
+        "$:/plugins/benwebber/dnd/macros/creature": {
+            "title": "$:/plugins/benwebber/dnd/macros/creature",
+            "tags": "$:/tags/Macro",
+            "text": "\\define dnd.creature()\n{{||$:/plugins/benwebber/dnd/templates/dnd.statblock}}\n\\end\n"
+        },
+        "$:/plugins/benwebber/dnd/macros/spell": {
+            "title": "$:/plugins/benwebber/dnd/macros/spell",
+            "tags": "$:/tags/Macro",
+            "text": "\\define dnd.spell()\n{{||$:/plugins/benwebber/dnd/templates/dnd.spell}}\n\\end\n"
+        },
+        "$:/plugins/benwebber/dnd/modules/macros/dnd._lingo.js": {
+            "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.run = exports.params = exports.name = void 0;\nexports.name = \"dnd._lingo\";\nexports.params = [\n    { name: \"title\" },\n];\nfunction run(title) {\n    var plugin = \"benwebber/dnd\";\n    var languageTitle = this.getVariable(\"languageTitle\");\n    var tiddlerTitle = \"$:/plugins/\" + plugin + \"/languages/\" + languageTitle + \"/\" + title;\n    if (this.wiki.isShadowTiddler(tiddlerTitle)) {\n        return \"{{\" + tiddlerTitle + \"}}\";\n    }\n    // Check if string is defined in dependency.\n    var dependents = this.wiki.getTextReference(\"$:/languages/\" + languageTitle + \"!!dependents\", \"\");\n    var dependentLanguageTitles = $tw.utils.parseStringArray(dependents)\n        .map(function (tiddler) { return tiddler.replace(\"$:/languages/\", \"\"); });\n    for (var _i = 0, dependentLanguageTitles_1 = dependentLanguageTitles; _i < dependentLanguageTitles_1.length; _i++) {\n        var dependentLanguageTitle = dependentLanguageTitles_1[_i];\n        var dependentTiddlerTitle = \"$:/plugins/\" + plugin + \"/languages/\" + dependentLanguageTitle + \"/\" + title;\n        if (this.wiki.isShadowTiddler(dependentTiddlerTitle)) {\n            return \"{{\" + dependentTiddlerTitle + \"}}\";\n        }\n    }\n    // Fall back to default string.\n    return \"{{$:/plugins/\" + plugin + \"/language/\" + title + \"}}\";\n}\nexports.run = run;\n",
+            "title": "$:/plugins/benwebber/dnd/modules/macros/dnd._lingo.js",
+            "type": "application/javascript",
+            "module-type": "macro"
+        },
+        "$:/plugins/benwebber/dnd/modules/macros/dnd._spellDescription.js": {
+            "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.run = exports.params = exports.name = void 0;\nvar dnd_js_1 = require(\"$:/plugins/benwebber/dnd/dnd.js\");\nexports.name = \"dnd._spellDescription\";\nexports.params = [\n    { name: \"level\" },\n    { name: \"school\" },\n    { name: \"ritual\" },\n];\nfunction run(level, school, ritual) {\n    var isRitual = ritual === \"true\";\n    // tslint:disable no-shadowed-variable\n    var isCantrip = function (level) { return parseInt(level, 10) === 0; };\n    var template;\n    if (isCantrip(level)) {\n        template = \"Spell/DescriptionFormat/Cantrip\";\n    }\n    else if (isRitual) {\n        template = \"Spell/DescriptionFormat/Ritual\";\n    }\n    else {\n        template = \"Spell/DescriptionFormat/Default\";\n    }\n    var format = this.wiki.renderText(\"text/plain\", \"text/vnd.tiddlywiki\", \"<<dnd._lingo \" + template + \">>\");\n    var schoolName = this.wiki.renderText(\"text/plain\", \"text/vnd.tiddlywiki\", \"<<dnd._lingo Spell/School/\" + dnd_js_1.capitalize(school) + \">>\");\n    var replacements = {\n        School: schoolName,\n        level: \"<<dnd._lingo Spell/Level/\" + level + \">>\",\n        school: schoolName.toLocaleLowerCase(),\n    };\n    var rendered = format.replace(/\\$(\\w+)\\$/g, function (_, key) { return replacements[key]; });\n    return rendered;\n}\nexports.run = run;\n",
+            "title": "$:/plugins/benwebber/dnd/modules/macros/dnd._spellDescription.js",
+            "type": "application/javascript",
+            "module-type": "macro"
+        },
+        "$:/plugins/benwebber/dnd/modules/macros/dnd.ability.js": {
+            "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.run = exports.params = exports.name = void 0;\nvar dnd_js_1 = require(\"$:/plugins/benwebber/dnd/dnd.js\");\nexports.name = \"dnd.ability\";\nexports.params = [{ name: \"score\" }];\nfunction run(score) {\n    var nScore = Number.parseInt(score, 10);\n    return dnd_js_1.ability(nScore);\n}\nexports.run = run;\n",
+            "title": "$:/plugins/benwebber/dnd/modules/macros/dnd.ability.js",
+            "type": "application/javascript",
+            "module-type": "macro"
+        },
+        "$:/plugins/benwebber/dnd/modules/macros/dnd.attack.js": {
+            "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.run = exports.params = exports.name = void 0;\nvar dnd_js_1 = require(\"$:/plugins/benwebber/dnd/dnd.js\");\nexports.name = \"dnd.attack\";\nexports.params = [\n    { name: \"name\" },\n    { name: \"type\" },\n    { name: \"bonus\" },\n    { name: \"reach\" },\n    { name: \"range\" },\n    { name: \"target\" },\n    { name: \"damage\" },\n    { name: \"damageType\" },\n    { name: \"extraDamage\" },\n    { name: \"extraDamageType\" },\n    { name: \"condDamage\" },\n    { name: \"condDamageType\" },\n    { name: \"extraCondDamage\" },\n    { name: \"extraCondDamageType\" },\n    { name: \"when\" },\n    { name: \"effect\" },\n];\n// tslint:disable no-shadowed-variable\nfunction run(name, attackType, bonus, reach, range, target, damage, damageType, extraDamage, extraDamageType, condDamage, condDamageType, extraCondDamage, extraCondDamageType, when, effect) {\n    var attackTypes = {\n        both: dnd_js_1.AttackType.MeleeOrRanged,\n        melee: dnd_js_1.AttackType.Melee,\n        ranged: dnd_js_1.AttackType.Ranged,\n    };\n    var damageTypes = {\n        acid: dnd_js_1.DamageType.Acid,\n        bludgeoning: dnd_js_1.DamageType.Bludgeoning,\n        cold: dnd_js_1.DamageType.Cold,\n        fire: dnd_js_1.DamageType.Fire,\n        force: dnd_js_1.DamageType.Force,\n        lightning: dnd_js_1.DamageType.Lightning,\n        necrotic: dnd_js_1.DamageType.Necrotic,\n        piercing: dnd_js_1.DamageType.Piercing,\n        poison: dnd_js_1.DamageType.Poison,\n        psychic: dnd_js_1.DamageType.Psychic,\n        radiant: dnd_js_1.DamageType.Radiant,\n        slashing: dnd_js_1.DamageType.Slashing,\n        thunder: dnd_js_1.DamageType.Thunder,\n    };\n    var eAttackType = attackTypes[attackType.toLowerCase()];\n    if (eAttackType == null) {\n        return \"\";\n    }\n    var eDamageType = damageTypes[damageType.toLowerCase()];\n    var eExtraDamageType = damageTypes[extraDamageType.toLowerCase()];\n    var eCondDamageType = damageTypes[condDamageType.toLowerCase()];\n    var eExtraCondDamageType = damageTypes[extraCondDamageType.toLowerCase()];\n    var output = [\n        \"//''\" + name + \".''//\",\n        dnd_js_1.weaponAttack(eAttackType, bonus, reach, range, target),\n        dnd_js_1.hit(damage, eDamageType, extraDamage, eExtraDamageType, condDamage, eCondDamageType, extraCondDamage, eExtraCondDamageType, when, effect),\n    ];\n    return output.join(\" \");\n}\nexports.run = run;\n",
+            "title": "$:/plugins/benwebber/dnd/modules/macros/dnd.attack.js",
+            "type": "application/javascript",
+            "module-type": "macro"
+        },
+        "$:/plugins/benwebber/dnd/modules/macros/dnd.average.js": {
+            "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.run = exports.params = exports.name = void 0;\nvar dnd_js_1 = require(\"$:/plugins/benwebber/dnd/dnd.js\");\nexports.name = \"dnd.average\";\nexports.params = [{ name: \"expr\" }];\nfunction run(expr) {\n    return dnd_js_1.average(expr);\n}\nexports.run = run;\n",
+            "title": "$:/plugins/benwebber/dnd/modules/macros/dnd.average.js",
+            "type": "application/javascript",
+            "module-type": "macro"
+        },
+        "$:/plugins/benwebber/dnd/modules/macros/dnd.characterblock.js": {
+            "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.run = exports.params = exports.name = void 0;\nvar dnd_js_1 = require(\"$:/plugins/benwebber/dnd/dnd.js\");\nexports.name = \"dnd.characterblock\";\nexports.params = [\n    { name: \"class\" },\n    { name: \"race\" },\n    { name: \"alignment\" },\n    { name: \"languages\" },\n    { name: \"factions\" },\n];\nfunction run(cls, race, alignment, languages, factions) {\n    if (this.wiki.getTiddler(cls)) {\n        cls = \"[[\" + cls + \"]]\";\n    }\n    if (this.wiki.getTiddler(race)) {\n        race = \"[[\" + race + \"]]\";\n    }\n    var character = new dnd_js_1.Character(cls, race, alignment, languages, factions);\n    return character.render();\n}\nexports.run = run;\n",
+            "title": "$:/plugins/benwebber/dnd/modules/macros/dnd.characterblock.js",
+            "type": "application/javascript",
+            "module-type": "macro"
+        },
+        "$:/plugins/benwebber/dnd/modules/macros/dnd.check.js": {
+            "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.run = exports.params = exports.name = void 0;\nvar dnd_js_1 = require(\"$:/plugins/benwebber/dnd/dnd.js\");\nexports.name = \"dnd.check\";\nexports.params = [\n    { name: \"ability\" },\n    { name: \"skill\" },\n    { name: \"dc\" },\n];\nfunction run(ability, skill, dc) {\n    var nDC = Number.parseInt(dc, 10);\n    return dnd_js_1.check(ability, skill, nDC);\n}\nexports.run = run;\n",
+            "title": "$:/plugins/benwebber/dnd/modules/macros/dnd.check.js",
+            "type": "application/javascript",
+            "module-type": "macro"
+        },
+        "$:/plugins/benwebber/dnd/modules/macros/dnd.modifier.js": {
+            "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.run = exports.params = exports.name = void 0;\nvar dnd_js_1 = require(\"$:/plugins/benwebber/dnd/dnd.js\");\nexports.name = \"dnd.modifier\";\nexports.params = [{ name: \"score\" }];\nfunction run(score) {\n    var nScore = Number.parseInt(score, 10);\n    return dnd_js_1.modifier(nScore);\n}\nexports.run = run;\n",
+            "title": "$:/plugins/benwebber/dnd/modules/macros/dnd.modifier.js",
+            "type": "application/javascript",
+            "module-type": "macro"
+        },
+        "$:/plugins/benwebber/dnd/modules/macros/dnd.spellblock.js": {
+            "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.run = exports.params = exports.name = void 0;\nvar dnd_js_1 = require(\"$:/plugins/benwebber/dnd/dnd.js\");\nexports.name = \"dnd.spellblock\";\nexports.params = [\n    { name: \"level\" },\n    { name: \"school\" },\n    { name: \"cast\" },\n    { name: \"ritual\" },\n    { name: \"range\" },\n    { name: \"verbal\" },\n    { name: \"somatic\" },\n    { name: \"material\" },\n    { name: \"duration\" },\n];\nfunction run(level, school, cast, ritual, range, verbal, somatic, material, duration) {\n    var isRitual = ritual === \"true\";\n    var isSomatic = somatic === \"true\";\n    var isVerbal = verbal === \"true\";\n    var nLevel = Number.parseInt(level, 10);\n    var spell = new dnd_js_1.Spell(nLevel, school, cast, isRitual, range, isVerbal, isSomatic, material, duration);\n    return spell.render();\n}\nexports.run = run;\n",
+            "title": "$:/plugins/benwebber/dnd/modules/macros/dnd.spellblock.js",
+            "type": "application/javascript",
+            "module-type": "macro"
+        },
+        "$:/plugins/benwebber/dnd/modules/macros/dnd.statblock.js": {
+            "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.run = exports.params = exports.name = void 0;\nvar dnd_js_1 = require(\"$:/plugins/benwebber/dnd/dnd.js\");\nexports.name = \"dnd.statblock\";\nexports.params = [\n    // All monsters/NPCs have these attributes:\n    { name: \"size\" },\n    { name: \"type\" },\n    { name: \"alignment\" },\n    { name: \"ac\" },\n    { name: \"hp\" },\n    { name: \"speed\" },\n    { name: \"str\", default: 10 },\n    { name: \"dex\", default: 10 },\n    { name: \"con\", default: 10 },\n    { name: \"int\", default: 10 },\n    { name: \"wis\", default: 10 },\n    { name: \"cha\", default: 10 },\n    { name: \"senses\" },\n    { name: \"languages\", default: \"---\" },\n    { name: \"challenge\" },\n    // These attributes are optional:\n    { name: \"tags\" },\n    { name: \"saves\" },\n    { name: \"skills\" },\n    { name: \"dimm\" },\n    { name: \"dres\" },\n    { name: \"dvul\" },\n    { name: \"cimm\" },\n    { name: \"cres\" },\n    { name: \"cvul\" },\n];\nfunction run(size, type, alignment, ac, hp, speed, str, dex, con, int, wis, cha, senses, languages, challenge, tags, saves, skills, dimm, dres, dvul, cimm, cres, cvul) {\n    var nStr = Number.parseInt(str, 10);\n    var nDex = Number.parseInt(dex, 10);\n    var nCon = Number.parseInt(con, 10);\n    var nInt = Number.parseInt(int, 10);\n    var nWis = Number.parseInt(wis, 10);\n    var nCha = Number.parseInt(cha, 10);\n    var statblock = new dnd_js_1.StatBlock(size, type, alignment, ac, hp, speed, nStr, nDex, nCon, nInt, nWis, nCha, senses, languages, challenge, tags, saves, skills, dimm, dres, dvul, cimm, cres, cvul);\n    return statblock.render();\n}\nexports.run = run;\n",
+            "title": "$:/plugins/benwebber/dnd/modules/macros/dnd.statblock.js",
+            "type": "application/javascript",
+            "module-type": "macro"
+        },
+        "$:/plugins/benwebber/dnd/modules/macros/dnd.xp.js": {
+            "text": "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.run = exports.params = exports.name = void 0;\nvar dnd_js_1 = require(\"$:/plugins/benwebber/dnd/dnd.js\");\nexports.name = \"dnd.xp\";\nexports.params = [\n    { name: \"rating\" },\n    { name: \"xp\" },\n];\nfunction run(rating, xp) {\n    var languageTitle = this.getVariable(\"languageTitle\");\n    var formatter = new Intl.NumberFormat(languageTitle);\n    // Try using user input directly. If `xp` is a number, use it.\n    var nXP = parseInt(xp, 10);\n    var hasXP = !Number.isNaN(nXP);\n    if (hasXP) {\n        return rating + \" (\" + formatter.format(nXP) + \" <<dnd._lingo XP>>)\";\n    }\n    // If `xp` is not a number or not defined, try using a standard score.\n    nXP = dnd_js_1.getXP(rating);\n    if (nXP != null) {\n        // Use standard scores (<<dnd.xp 5>>)\n        return rating + \" (\" + formatter.format(nXP) + \" <<dnd._lingo XP>>)\";\n    }\n    // Unknown rating: pass through (<<dnd.xp \"5 (800 XP)\">>).\n    return rating;\n}\nexports.run = run;\n",
+            "title": "$:/plugins/benwebber/dnd/modules/macros/dnd.xp.js",
+            "type": "application/javascript",
+            "module-type": "macro"
+        },
+        "$:/plugins/benwebber/dnd/templates/dnd.character": {
+            "title": "$:/plugins/benwebber/dnd/templates/dnd.character",
+            "text": "\\define field-character()\n\n<$macrocall\n  $name=\"dnd.characterblock\"\n  class={{!!dnd.character.class}}\n  race={{!!dnd.character.race}}\n  alignment={{!!dnd.character.alignment}}\n  languages={{!!dnd.character.languages}}\n  factions={{!!dnd.character.factions}}\n/>\n\n\\end\n\n\\define data-character()\n\n<$macrocall\n  $name=\"dnd.characterblock\"\n  class={{##class}}\n  race={{##race}}\n  alignment={{##alignment}}\n  languages={{##languages}}\n  factions={{##factions}}\n/>\n\n\\end\n\n<$reveal type=\"match\" state=\"!!type\" text=\"text/vnd.tiddlywiki\" default=\"text/vnd.tiddlywiki\">\n\n<<field-character>>\n</$reveal>\n<$reveal type=\"match\" state=\"!!type\" text=\"application/x-tiddler-dictionary\">\n\n<<data-character>>\n</$reveal>\n<$reveal type=\"match\" state=\"!!type\" text=\"application/json\">\n\n<<data-character>>\n</$reveal>\n"
+        },
+        "$:/plugins/benwebber/dnd/templates/dnd.spell": {
+            "title": "$:/plugins/benwebber/dnd/templates/dnd.spell",
+            "text": "\\define field-spell()\n\n<$macrocall\n  $name=\"dnd.spellblock\"\n  level={{!!dnd.spell.level}}\n  school={{!!dnd.spell.school}}\n  cast={{!!dnd.spell.cast}}\n  ritual={{!!dnd.spell.ritual}}\n  range={{!!dnd.spell.range}}\n  verbal={{!!dnd.spell.verbal}}\n  somatic={{!!dnd.spell.somatic}}\n  material={{!!dnd.spell.material}}\n  duration={{!!dnd.spell.duration}}\n/>\n\n\\end\n\n\\define data-spell()\n\n<$macrocall\n  $name=\"dnd.spellblock\"\n  level={{##level}}\n  school={{##school}}\n  cast={{##cast}}\n  ritual={{##ritual}}\n  range={{##range}}\n  components={{##components}}\n  verbal={{##verbal}}\n  somatic={{##somatic}}\n  material={{##material}}\n  duration={{##duration}}\n/>\n\n\\end\n\n<$reveal type=\"match\" state=\"!!type\" text=\"text/vnd.tiddlywiki\" default=\"text/vnd.tiddlywiki\">\n\n<<field-spell>>\n</$reveal>\n<$reveal type=\"match\" state=\"!!type\" text=\"application/x-tiddler-dictionary\">\n\n<<data-spell>>\n</$reveal>\n<$reveal type=\"match\" state=\"!!type\" text=\"application/json\">\n\n<<data-spell>>\n</$reveal>\n"
+        },
+        "$:/plugins/benwebber/dnd/templates/dnd.statblock": {
+            "title": "$:/plugins/benwebber/dnd/templates/dnd.statblock",
+            "text": "\\define field-statblock()\n\n<$macrocall\n  $name=\"dnd.statblock\"\n  size={{!!dnd.creature.size}}\n  type={{!!dnd.creature.type}}\n  tags={{!!dnd.creature.tags}}\n  alignment={{!!dnd.creature.alignment}}\n  ac={{!!dnd.creature.ac}}\n  hp={{!!dnd.creature.hp}}\n  speed={{!!dnd.creature.speed}}\n  str={{!!dnd.creature.str}}\n  dex={{!!dnd.creature.dex}}\n  con={{!!dnd.creature.con}}\n  int={{!!dnd.creature.int}}\n  wis={{!!dnd.creature.wis}}\n  cha={{!!dnd.creature.cha}}\n  saves={{!!dnd.creature.saves}}\n  skills={{!!dnd.creature.skills}}\n  dimm={{!!dnd.creature.dimm}}\n  dres={{!!dnd.creature.dres}}\n  dvul={{!!dnd.creature.dvul}}\n  cimm={{!!dnd.creature.cimm}}\n  cres={{!!dnd.creature.cres}}\n  cvul={{!!dnd.creature.cvul}}\n  senses={{!!dnd.creature.senses}}\n  languages={{!!dnd.creature.languages}}\n  challenge={{!!dnd.creature.challenge}}\n/>\n\n\\end\n\n\\define data-statblock()\n\n<$macrocall\n  $name=\"dnd.statblock\"\n  size={{##size}}\n  type={{##type}}\n  tags={{##tags}}\n  alignment={{##alignment}}\n  ac={{##ac}}\n  hp={{##hp}}\n  speed={{##speed}}\n  str={{##str}}\n  dex={{##dex}}\n  con={{##con}}\n  int={{##int}}\n  wis={{##wis}}\n  cha={{##cha}}\n  saves={{##saves}}\n  skills={{##skills}}\n  dimm={{##dimm}}\n  dres={{##dres}}\n  dvul={{##dvul}}\n  cimm={{##cimm}}\n  cres={{##cres}}\n  cvul={{##cvul}}\n  senses={{##senses}}\n  languages={{##languages}}\n  challenge={{##challenge}}\n/>\n\n\\end\n\n<$reveal type=\"match\" state=\"!!type\" text=\"text/vnd.tiddlywiki\" default=\"text/vnd.tiddlywiki\">\n\n<<field-statblock>>\n</$reveal>\n<$reveal type=\"match\" state=\"!!type\" text=\"application/x-tiddler-dictionary\">\n\n<<data-statblock>>\n</$reveal>\n<$reveal type=\"match\" state=\"!!type\" text=\"application/json\">\n\n<<data-statblock>>\n</$reveal>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/Buttons/add-note": {
+            "title": "$:/plugins/benwebber/dnd/ui/Buttons/add-note",
+            "tags": "$:/tags/ViewToolbar",
+            "list-after": "$:/plugins/benwebber/dnd/ui/Buttons/edit-attributes",
+            "caption": "{{$:/plugins/benwebber/dnd/images/add-note}} <<dnd._lingo Buttons/AddNote/Text>>",
+            "description": "<<dnd._lingo Buttons/AddNote/Tooltip>>",
+            "text": "\\whitespace trim\n\n\\define actions()\n<$set name=\"target\" filter=\"[<currentTiddler>]\">\n<$action-createtiddler\n  $basetitle=\"$(currentTiddler)$: Note\"\n  $savetitle=\"$:/temp/plugins/benwebber/dnd/new-note\"\n  list=<<target>>\n  tags={{$:/plugins/benwebber/dnd/config/Tags/Notes}}\n/>\n<$action-sendmessage $message=\"tm-edit-tiddler\" $param={{$:/temp/plugins/benwebber/dnd/new-note}}/>\n<$action-sendmessage $message=\"tm-delete-tiddler\" $param={{$:/temp/plugins/benwebber/dnd/new-note}}/>\n</$set>\n\\end\n\n<$list filter=\"[<currentTiddler>!is[system]!tag{$:/plugins/benwebber/dnd/config/Tags/Notes}]\">\n<$wikify name=\"text\" text=<<dnd._lingo Buttons/AddNote/Text>>>\n<$wikify name=\"tooltip\" text=<<dnd._lingo Buttons/AddNote/Tooltip>>>\n<$button actions=<<actions>> tooltip=<<tooltip>> aria-label=<<text>> class=<<tv-config-toolbar-class>>>\n<$list filter=\"[<tv-config-toolbar-icons>prefix[yes]]\">\n{{$:/plugins/benwebber/dnd/images/add-note}}\n</$list>\n<$list filter=\"[<tv-config-toolbar-text>prefix[yes]]\">\n<span class=\"tc-btn-text\"><$text text=<<text>>/></span>\n</$list />>\n</$button>\n</$wikify>\n</$wikify>\n</$list>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/Buttons/edit-attributes": {
+            "title": "$:/plugins/benwebber/dnd/ui/Buttons/edit-attributes",
+            "tags": "$:/tags/ViewToolbar",
+            "list-after": "$:/core/ui/Buttons/edit",
+            "caption": "{{$:/plugins/benwebber/dnd/images/edit-attributes}} <<dnd._lingo Buttons/EditAttributes/Text>>",
+            "description": "<<dnd._lingo Buttons/EditAttributes/Tooltip>>",
+            "text": "\\whitespace trim\n\n\\define showButtonFilter()\n[<currentTiddler>tag{$:/plugins/benwebber/dnd/config/Tags/Characters}] [<currentTiddler>tag{$:/plugins/benwebber/dnd/config/Tags/Creatures}] [<currentTiddler>tag{$:/plugins/benwebber/dnd/config/Tags/Spells}]\n\\end\n\n\\define actions()\n<!--\nIf the user enters, then deletes a value in the form, the corresponding field\nwill be empty. Delete empty fields.\n-->\n<$list filter=\"[title<currentTiddler>fields[]]\" variable=\"field\">\n<$list filter=\"[title<currentTiddler>!has<field>]\">\n<$action-deletefield $field=<<field>> />\n</$list>\n</$list>\n<!-- Open editor form. -->\n<$action-sendmessage\n  $message=\"tm-modal\"\n  $param=\"$:/plugins/benwebber/dnd/ui/Modals/EditAttributes\"\n  tiddler=\"$(currentTiddler)$\"\n/>\n\\end\n\n<$list filter=<<showButtonFilter>>>\n<$wikify name=\"text\" text=<<dnd._lingo Buttons/EditAttributes/Text>>>\n<$wikify name=\"title\" text=<<dnd._lingo Buttons/EditAttributes/Title>>>\n<$wikify name=\"tooltip\" text=<<dnd._lingo Buttons/EditAttributes/Tooltip>>>\n<$button actions=<<actions>> tooltip=<<tooltip>> aria-label=<<text>> class=<<tv-config-toolbar-class>>>\n<$list filter=\"[<tv-config-toolbar-icons>prefix[yes]]\">\n{{$:/plugins/benwebber/dnd/images/edit-attributes}}\n</$list>\n<$list filter=\"[<tv-config-toolbar-text>prefix[yes]]\">\n<span class=\"tc-btn-text\"><$text text=<<text>>/></span>\n</$list>\n</$button>\n</$wikify>\n</$wikify>\n</$wikify>\n</$list>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/Buttons/export-player-edition": {
+            "title": "$:/plugins/benwebber/dnd/ui/Buttons/export-player-edition",
+            "tags": "$:/tags/PageControls",
+            "caption": "{{$:/plugins/benwebber/dnd/images/export-player-edition}} <<dnd._lingo Buttons/ExportPlayerEdition/Text>>",
+            "description": "<<dnd._lingo Buttons/ExportPlayerEdition/Tooltip>>",
+            "text": "\\define actions()\n<$action-setfield $tiddler=\"$:/plugins/benwebber/dnd/config/PlayerEdition\" text=\"true\"/>\n<$action-sendmessage\n  $message=\"tm-download-file\"\n  $param=\"$:/plugins/benwebber/dnd/PlayerEdition\"\n  filename=\"public.html\"\n/>\n<$action-setfield $tiddler=\"$:/plugins/benwebber/dnd/config/PlayerEdition\" text=\"false\"/>\n\\end\n\n<$reveal type=\"nomatch\" state=\"$:/plugins/benwebber/dnd/config/PlayerEdition\" text=\"true\">\n<$wikify name=\"text\" text=<<dnd._lingo Buttons/ExportPlayerEdition/Text>>>\n<$wikify name=\"title\" text=<<dnd._lingo Buttons/ExportPlayerEdition/Title>>>\n<$wikify name=\"tooltip\" text=<<dnd._lingo Buttons/ExportPlayerEdition/Tooltip>>>\n<$button actions=<<actions>> class=<<tv-config-toolbar-class>> tooltip=<<tooltip>>>\n<$list filter=\"[<tv-config-toolbar-icons>prefix[yes]]\">\n{{$:/plugins/benwebber/dnd/images/export-player-edition}}\n</$list>\n<$list filter=\"[<tv-config-toolbar-text>prefix[yes]]\">\n<span class=\"tc-btn-text\"><$text text=<<text>>/></span>\n</$list>\n</$button>\n</$wikify>\n</$wikify>\n</$wikify>\n</$reveal>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/Buttons/new-character": {
+            "title": "$:/plugins/benwebber/dnd/ui/Buttons/new-character",
+            "tags": "$:/tags/PageControls",
+            "caption": "{{$:/plugins/benwebber/dnd/images/new-character}} <<dnd._lingo Buttons/NewCharacter/Text>>",
+            "description": "<<dnd._lingo Buttons/NewCharacter/Tooltip>>",
+            "text": "\\define actions()\n<$action-sendmessage\n  $message=\"tm-new-tiddler\"\n  title=<<title>>\n  tags={{$:/plugins/benwebber/dnd/config/Tags/Characters}}\n/>\n\\end\n\n<$wikify name=\"text\" text=<<dnd._lingo Buttons/NewCharacter/Text>>>\n<$wikify name=\"title\" text=<<dnd._lingo Buttons/NewCharacter/Title>>>\n<$wikify name=\"tooltip\" text=<<dnd._lingo Buttons/NewCharacter/Tooltip>>>\n<$button actions=<<actions>> class=<<tv-config-toolbar-class>> tooltip=<<tooltip>>>\n<$list filter=\"[<tv-config-toolbar-icons>prefix[yes]]\">\n{{$:/plugins/benwebber/dnd/images/new-character}}\n</$list>\n<$list filter=\"[<tv-config-toolbar-text>prefix[yes]]\">\n<span class=\"tc-btn-text\"><$text text=<<text>>/></span>\n</$list>\n</$button>\n</$wikify>\n</$wikify>\n</$wikify>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/Buttons/new-creature": {
+            "title": "$:/plugins/benwebber/dnd/ui/Buttons/new-creature",
+            "tags": "$:/tags/PageControls",
+            "caption": "{{$:/plugins/benwebber/dnd/images/new-creature}} <<dnd._lingo Buttons/NewCreature/Text>>",
+            "description": "<<dnd._lingo Buttons/NewCreature/Tooltip>>",
+            "text": "\\define actions()\n<$action-sendmessage\n  $message=\"tm-new-tiddler\"\n  title=<<title>>\n  tags={{$:/plugins/benwebber/dnd/config/Tags/Creatures}}\n/>\n\\end\n\n<$wikify name=\"text\" text=<<dnd._lingo Buttons/NewCreature/Text>>>\n<$wikify name=\"title\" text=<<dnd._lingo Buttons/NewCreature/Title>>>\n<$wikify name=\"tooltip\" text=<<dnd._lingo Buttons/NewCreature/Tooltip>>>\n<$button actions=<<actions>> class=<<tv-config-toolbar-class>> tooltip=<<tooltip>>>\n<$list filter=\"[<tv-config-toolbar-icons>prefix[yes]]\">\n{{$:/plugins/benwebber/dnd/images/new-creature}}\n</$list>\n<$list filter=\"[<tv-config-toolbar-text>prefix[yes]]\">\n<span class=\"tc-btn-text\"><$text text=<<text>>/></span>\n</$list>\n</$button>\n</$wikify>\n</$wikify>\n</$wikify>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/Buttons/new-spell": {
+            "title": "$:/plugins/benwebber/dnd/ui/Buttons/new-spell",
+            "tags": "$:/tags/PageControls",
+            "caption": "{{$:/plugins/benwebber/dnd/images/new-spell}} <<dnd._lingo Buttons/NewSpell/Text>>",
+            "description": "<<dnd._lingo Buttons/NewSpell/Tooltip>>",
+            "text": "\\define actions()\n<$action-sendmessage\n  $message=\"tm-new-tiddler\"\n  title=<<title>>\n  tags={{$:/plugins/benwebber/dnd/config/Tags/Spells}}\n/>\n\\end\n\n<$wikify name=\"text\" text=<<dnd._lingo Buttons/NewSpell/Text>>>\n<$wikify name=\"title\" text=<<dnd._lingo Buttons/NewSpell/Title>>>\n<$wikify name=\"tooltip\" text=<<dnd._lingo Buttons/NewSpell/Tooltip>>>\n<$button actions=<<actions>> class=<<tv-config-toolbar-class>> tooltip=<<tooltip>>>\n<$list filter=\"[<tv-config-toolbar-icons>prefix[yes]]\">\n{{$:/plugins/benwebber/dnd/images/new-spell}}\n</$list>\n<$list filter=\"[<tv-config-toolbar-text>prefix[yes]]\">\n<span class=\"tc-btn-text\"><$text text=<<text>>/></span>\n</$list>\n</$button>\n</$wikify>\n</$wikify>\n</$wikify>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/Buttons/player-edition": {
+            "title": "$:/plugins/benwebber/dnd/ui/Buttons/player-edition",
+            "tags": "$:/tags/ViewToolbar",
+            "caption": "{{$:/plugins/benwebber/dnd/images/public}} <<dnd._lingo Buttons/PlayerEdition/Text>>",
+            "description": "<<dnd._lingo Buttons/PlayerEdition/Description>>",
+            "list-after": "$:/plugins/benwebber/dnd/ui/Buttons/add-note",
+            "text": "\\whitespace trim\n\n\\define mark-public()\n<$action-sendmessage $message=\"tm-add-tag\" $param={{$:/plugins/benwebber/dnd/config/Tags/PlayerEdition}}/>\n\\end\n\n\\define mark-private()\n<$action-sendmessage $message=\"tm-remove-tag\" $param={{$:/plugins/benwebber/dnd/config/Tags/PlayerEdition}}/>\n\\end\n\n<$reveal type=\"nomatch\" state=\"$:/plugins/benwebber/dnd/config/PlayerEdition\" text=\"true\">\n<$list filter=\"[all[current]!is[system]tag{$:/plugins/benwebber/dnd/config/Tags/PlayerEdition}]\" variable=\"noop\">\n<$wikify name=\"text\" text=<<dnd._lingo Buttons/Public/Text>>>\n<$wikify name=\"tooltip\" text=<<dnd._lingo Buttons/Public/Tooltip>>>\n<$fieldmangler>\n<$button actions=<<mark-private>> tooltip=<<tooltip>> aria-label=<<text>> class=<<tv-config-toolbar-class>>>\n<$list filter=\"[<tv-config-toolbar-icons>prefix[yes]]\">\n{{$:/plugins/benwebber/dnd/images/public}}\n</$list>\n<$list filter=\"[<tv-config-toolbar-text>prefix[yes]]\">\n<span class=\"tc-btn-text\"><$text text=<<text>>/></span>\n</$list>\n</$button>\n</$fieldmangler>\n</$wikify>\n</$wikify>\n</$list>\n\n<$list filter=\"[all[current]!is[system]!tag{$:/plugins/benwebber/dnd/config/Tags/PlayerEdition}]\" variable=\"noop\">\n<$wikify name=\"text\" text=<<dnd._lingo Buttons/Private/Text>>>\n<$wikify name=\"tooltip\" text=<<dnd._lingo Buttons/Private/Tooltip>>>\n<$fieldmangler>\n<$button actions=<<mark-public>> tooltip=<<tooltip>> aria-label=<<text>> class=<<tv-config-toolbar-class>>>\n<$list filter=\"[<tv-config-toolbar-icons>prefix[yes]]\">\n{{$:/plugins/benwebber/dnd/images/private}}\n</$list>\n<$list filter=\"[<tv-config-toolbar-text>prefix[yes]]\">\n<span class=\"tc-btn-text\"><$text text=<<text>>/></span>\n</$list>\n</$button>\n</$fieldmangler>\n</$wikify>\n</$wikify>\n</$list>\n</$reveal>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/EditTemplate/attributes": {
+            "title": "$:/plugins/benwebber/dnd/ui/EditTemplate/attributes",
+            "tags": "$:/tags/EditTemplate",
+            "list-before": "$:/core/ui/EditTemplate/body",
+            "text": "<$vars showHelp=\"false\" tiddler=<<currentTiddler>>>\n{{$:/plugins/benwebber/dnd/ui/Modals/EditAttributes}}\n</$vars>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/Modals/EditAttributes": {
+            "title": "$:/plugins/benwebber/dnd/ui/Modals/EditAttributes",
+            "subtitle": "<<dnd._lingo Modals/Subtitle>>",
+            "text": "\\define input(field)\n<$edit-text tag=input tiddler=<<tiddler>> field=<<__field__>> />\n\\end\n\n\\define creature-select-size()\n<$select tiddler=<<tiddler>> field=\"dnd.creature.size\">\n  <option value=\"tiny\"><<dnd._lingo Creature/Size/Tiny>></option>\n  <option value=\"small\"><<dnd._lingo Creature/Size/Small>></option>\n  <option value=\"medium\"><<dnd._lingo Creature/Size/Medium>></option>\n  <option value=\"large\"><<dnd._lingo Creature/Size/Large>></option>\n  <option value=\"huge\"><<dnd._lingo Creature/Size/Huge>></option>\n  <option value=\"gargantuan\"><<dnd._lingo Creature/Size/Gargantuan>></option>\n</$select>\n\\end\n\n\\define creature-select-type()\n<$select tiddler=<<tiddler>> field=\"dnd.creature.type\">\n  <option value=\"aberration\"><<dnd._lingo Creature/Type/Aberration>></option>\n  <option value=\"beast\"><<dnd._lingo Creature/Type/Beast>></option>\n  <option value=\"celestial\"><<dnd._lingo Creature/Type/Celestial>></option>\n  <option value=\"construct\"><<dnd._lingo Creature/Type/Construct>></option>\n  <option value=\"dragon\"><<dnd._lingo Creature/Type/Dragon>></option>\n  <option value=\"elemental\"><<dnd._lingo Creature/Type/Elemental>></option>\n  <option value=\"fey\"><<dnd._lingo Creature/Type/Fey>></option>\n  <option value=\"fiend\"><<dnd._lingo Creature/Type/Fiend>></option>\n  <option value=\"giant\"><<dnd._lingo Creature/Type/Giant>></option>\n  <option value=\"humanoid\"><<dnd._lingo Creature/Type/Humanoid>></option>\n  <option value=\"monstrosity\"><<dnd._lingo Creature/Type/Monstrosity>></option>\n  <option value=\"ooze\"><<dnd._lingo Creature/Type/Ooze>></option>\n  <option value=\"plant\"><<dnd._lingo Creature/Type/Plant>></option>\n  <option value=\"undead\"><<dnd._lingo Creature/Type/Undead>></option>\n</$select>\n\\end\n\n\\define creature-select-ability(field)\n<$select tiddler=<<tiddler>> field=<<__field__>>>\n  <option value=\"1\"><<dnd.ability 1>></option>\n  <option value=\"2\"><<dnd.ability 2>></option>\n  <option value=\"3\"><<dnd.ability 3>></option>\n  <option value=\"4\"><<dnd.ability 4>></option>\n  <option value=\"5\"><<dnd.ability 5>></option>\n  <option value=\"6\"><<dnd.ability 6>></option>\n  <option value=\"7\"><<dnd.ability 7>></option>\n  <option value=\"8\"><<dnd.ability 8>></option>\n  <option value=\"9\"><<dnd.ability 9>></option>\n  <option value=\"10\"><<dnd.ability 10>></option>\n  <option value=\"11\"><<dnd.ability 11>></option>\n  <option value=\"12\"><<dnd.ability 12>></option>\n  <option value=\"13\"><<dnd.ability 13>></option>\n  <option value=\"14\"><<dnd.ability 14>></option>\n  <option value=\"15\"><<dnd.ability 15>></option>\n  <option value=\"16\"><<dnd.ability 16>></option>\n  <option value=\"17\"><<dnd.ability 17>></option>\n  <option value=\"18\"><<dnd.ability 18>></option>\n  <option value=\"19\"><<dnd.ability 19>></option>\n  <option value=\"20\"><<dnd.ability 20>></option>\n  <option value=\"21\"><<dnd.ability 21>></option>\n  <option value=\"22\"><<dnd.ability 22>></option>\n  <option value=\"23\"><<dnd.ability 23>></option>\n  <option value=\"24\"><<dnd.ability 24>></option>\n  <option value=\"25\"><<dnd.ability 25>></option>\n  <option value=\"26\"><<dnd.ability 26>></option>\n  <option value=\"27\"><<dnd.ability 27>></option>\n  <option value=\"28\"><<dnd.ability 28>></option>\n  <option value=\"29\"><<dnd.ability 29>></option>\n  <option value=\"30\"><<dnd.ability 30>></option>\n</$select>\n\\end\n\n\\define creature-select-challenge()\n<$select tiddler=<<tiddler>> field=\"dnd.creature.challenge\">>\n  <option value=\"0\"><<dnd.xp \"0\">></option>\n  <option value=\"0 10\"><<dnd.xp \"0\" \"10\">></option>\n  <option value=\"1/8\"><<dnd.xp \"1/8\">></option>\n  <option value=\"1/4\"><<dnd.xp \"1/4\">></option>\n  <option value=\"1/2\"><<dnd.xp \"1/2\">></option>\n  <option value=\"1\"><<dnd.xp \"1\">></option>\n  <option value=\"2\"><<dnd.xp \"2\">></option>\n  <option value=\"3\"><<dnd.xp \"3\">></option>\n  <option value=\"4\"><<dnd.xp \"4\">></option>\n  <option value=\"5\"><<dnd.xp \"5\">></option>\n  <option value=\"6\"><<dnd.xp \"6\">></option>\n  <option value=\"7\"><<dnd.xp \"7\">></option>\n  <option value=\"8\"><<dnd.xp \"8\">></option>\n  <option value=\"9\"><<dnd.xp \"9\">></option>\n  <option value=\"10\"><<dnd.xp \"10\">></option>\n  <option value=\"11\"><<dnd.xp \"11\">></option>\n  <option value=\"12\"><<dnd.xp \"12\">></option>\n  <option value=\"13\"><<dnd.xp \"13\">></option>\n  <option value=\"14\"><<dnd.xp \"14\">></option>\n  <option value=\"15\"><<dnd.xp \"15\">></option>\n  <option value=\"16\"><<dnd.xp \"16\">></option>\n  <option value=\"17\"><<dnd.xp \"17\">></option>\n  <option value=\"18\"><<dnd.xp \"18\">></option>\n  <option value=\"19\"><<dnd.xp \"19\">></option>\n  <option value=\"20\"><<dnd.xp \"20\">></option>\n  <option value=\"21\"><<dnd.xp \"21\">></option>\n  <option value=\"22\"><<dnd.xp \"22\">></option>\n  <option value=\"23\"><<dnd.xp \"23\">></option>\n  <option value=\"24\"><<dnd.xp \"24\">></option>\n  <option value=\"25\"><<dnd.xp \"25\">></option>\n  <option value=\"26\"><<dnd.xp \"26\">></option>\n  <option value=\"27\"><<dnd.xp \"27\">></option>\n  <option value=\"28\"><<dnd.xp \"28\">></option>\n  <option value=\"29\"><<dnd.xp \"29\">></option>\n  <option value=\"30\"><<dnd.xp \"30\">></option>\n</$select>\n\\end\n\n\\define spell-select-level(field)\n<$select tiddler=<<tiddler>> field=\"dnd.spell.level\">\n  <option>0</option>\n  <option>1</option>\n  <option>2</option>\n  <option>3</option>\n  <option>4</option>\n  <option>5</option>\n  <option>6</option>\n  <option>7</option>\n  <option>8</option>\n  <option>9</option>\n</$select>\n\\end\n\n\\define spell-select-school()\n<$select tiddler=<<tiddler>> field=\"dnd.spell.school\">\n  <option value=\"abjuration\"><<dnd._lingo Spell/School/Abjuration>></option>\n  <option value=\"conjuration\"><<dnd._lingo Spell/School/Conjuration>></option>\n  <option value=\"divination\"><<dnd._lingo Spell/School/Divination>></option>\n  <option value=\"enchantment\"><<dnd._lingo Spell/School/Enchantment>></option>\n  <option value=\"evocation\"><<dnd._lingo Spell/School/Evocation>></option>\n  <option value=\"illusion\"><<dnd._lingo Spell/School/Illusion>></option>\n  <option value=\"necromancy\"><<dnd._lingo Spell/School/Necromancy>></option>\n  <option value=\"transmutation\"><<dnd._lingo Spell/School/Transmutation>></option>\n</$select>\n\\end\n\n<$reveal type=\"nomatch\" default=<<showHelp>> text=\"false\">\n<<dnd._lingo Modals/Help>>\n</$reveal>\n\n<$list filter=\"[title<tiddler>tag{$:/plugins/benwebber/dnd/config/Tags/Characters}]\">\n\n|!<<dnd._lingo Character/Class>> |<<input dnd.character.class>> |\n|!<<dnd._lingo Character/Race>> |<<input dnd.character.race>> |\n|!<<dnd._lingo Character/Alignment>> |<<input dnd.character.alignment>> |\n|!<<dnd._lingo Character/Languages>> |<<input dnd.character.languages>> |\n|!<<dnd._lingo Character/Factions>> |<<input dnd.character.factions>> |\n</$list>\n<$list filter=\"[title<tiddler>tag{$:/plugins/benwebber/dnd/config/Tags/Spells}]\">\n\n|!<<dnd._lingo Spell/Level>> |<<spell-select-level>> |\n|!<<dnd._lingo Spell/School>> |<<spell-select-school>> |\n|!<<dnd._lingo Spell/CastingTime>> |<<input dnd.spell.cast>> <$checkbox tiddler=<<tiddler>> field=\"dnd.spell.ritual\" checked=\"true\" unchecked=\"\" default=\"\"> <<dnd._lingo Spell/Ritual>></$checkbox> |\n|!<<dnd._lingo Spell/Range>> |<<input dnd.spell.range>> |\n|!<<dnd._lingo Spell/Duration>> |<<input dnd.spell.duration>> |\n|!<<dnd._lingo Spell/Components>> |<$checkbox tiddler=<<tiddler>> field=\"dnd.spell.verbal\" checked=\"true\" unchecked=\"\" default=\"\"> <<dnd._lingo Spell/Verbal>></$checkbox> <$checkbox tiddler=<<tiddler>> field=\"dnd.spell.somatic\" checked=\"true\" unchecked=\"\" default=\"\"> <<dnd._lingo Spell/Somatic>></$checkbox> <<dnd._lingo Spell/Material>>: <<input dnd.spell.material>> |\n</$list>\n<$list filter=\"[title<tiddler>tag{$:/plugins/benwebber/dnd/config/Tags/Creatures}]\">\n\n|!<<dnd._lingo StatBlock/Size>> |<<creature-select-size>> |\n|!<<dnd._lingo StatBlock/Type>> |<<creature-select-type>> |\n|!<<dnd._lingo StatBlock/Tags>> |<<input dnd.creature.tags>> |\n|!<<dnd._lingo StatBlock/Alignment>> |<<input dnd.creature.alignment>> |\n\n---\n\n|!<<dnd._lingo StatBlock/AC>> |<<input dnd.creature.ac>> |\n|!<<dnd._lingo StatBlock/HP>> |<<input dnd.creature.hp>> |\n|!<<dnd._lingo StatBlock/Speed>> |<<input dnd.creature.speed>> |\n\n---\n\n| <<dnd._lingo StatBlock/STR>> | <<dnd._lingo StatBlock/DEX>> | <<dnd._lingo StatBlock/CON>> | <<dnd._lingo StatBlock/INT>> | <<dnd._lingo StatBlock/WIS>> | <<dnd._lingo StatBlock/CHA>> |h\n| <<creature-select-ability dnd.creature.str>> | <<creature-select-ability dnd.creature.dex>> | <<creature-select-ability dnd.creature.con>> | <<creature-select-ability dnd.creature.int>> | <<creature-select-ability dnd.creature.wis>> | <<creature-select-ability dnd.creature.cha>> |\n\n---\n\n|!<<dnd._lingo StatBlock/SavingThrows>> |<<input dnd.creature.saves>> |\n|!<<dnd._lingo StatBlock/Skills>> |<<input dnd.creature.skills>> |\n|!<<dnd._lingo StatBlock/DamageImmunities>> |<<input dnd.creature.dimm>> |\n|!<<dnd._lingo StatBlock/DamageResistances>> |<<input dnd.creature.dres>> |\n|!<<dnd._lingo StatBlock/DamageVulnerabilities>> |<<input dnd.creature.dvul>> |\n|!<<dnd._lingo StatBlock/ConditionImmunities>> |<<input dnd.creature.cimm>> |\n|!<<dnd._lingo StatBlock/ConditionResistances>> |<<input dnd.creature.cres>> |\n|!<<dnd._lingo StatBlock/ConditionVulnerabilities>> |<<input dnd.creature.cvul>> |\n|!<<dnd._lingo StatBlock/Senses>> |<<input dnd.creature.senses>> |\n|!<<dnd._lingo StatBlock/Languages>> |<<input dnd.creature.languages>> |\n|!<<dnd._lingo StatBlock/Challenge>> |<<creature-select-challenge>> |\n</$list>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/ViewTemplate/character": {
+            "title": "$:/plugins/benwebber/dnd/ui/ViewTemplate/character",
+            "tags": "$:/tags/ViewTemplate",
+            "list-before": "$:/core/ui/ViewTemplate/body",
+            "text": "<!-- Check tiddler tag. -->\n<$list filter=\"[<currentTiddler>tag{$:/plugins/benwebber/dnd/config/Tags/Characters}]\">\n<!-- Check if user enabled view template; don't override <<currentTiddler>>. -->\n<$list\n  filter=\"[title[$:/plugins/benwebber/dnd/config/ViewTemplates/Character]field:text[true]]\"\n  variable=\"noop\"\n>\n\n<<dnd.character>>\n</$list>\n</$list>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/ViewTemplate/notes": {
+            "title": "$:/plugins/benwebber/dnd/ui/ViewTemplate/notes",
+            "tags": "$:/tags/ViewTemplate",
+            "list-after": "$:/core/ui/ViewTemplate/tags",
+            "text": "\\define edit-actions()\n<$action-sendmessage $message=\"tm-edit-tiddler\" $param=<<currentTiddler>> />\n\\end\n\n\\define delete-actions()\n<$action-sendmessage $message=\"tm-delete-tiddler\" $param=<<currentTiddler>> />\n\\end\n\n<$wikify name=\"edit-note-text\" text=<<dnd._lingo Buttons/EditNote/Text>>>\n<$wikify name=\"edit-note-tooltip\" text=<<dnd._lingo Buttons/EditNote/Tooltip>>>\n<$wikify name=\"delete-note-text\" text=<<dnd._lingo Buttons/DeleteNote/Text>>>\n<$wikify name=\"delete-note-tooltip\" text=<<dnd._lingo Buttons/DeleteNote/Tooltip>>>\n<$list filter=\"[title[$:/plugins/benwebber/dnd/config/ViewTemplates/Notes]field:text[true]]\" variable=\"noop\">\n<$list filter=\"[title<currentTiddler>listed[]tag{$:/plugins/benwebber/dnd/config/Tags/Notes}!has[draft.of]sort[created]]\">\n<div class=\"dnd-note\">\n<$transclude mode=\"block\"/>\n<div class=\"dnd-note-menu\">\n  <ul>\n    <li><$button actions=<<edit-actions>> aria-label=<<edit-note-text>> class=\"tc-btn-invisible\" tooltip=<<edit-note-tooltip>>>{{$:/core/images/edit-button}}</$button></li>\n    <li><$button actions=<<delete-actions>> aria-label=<<delete-note-text>> class=\"tc-btn-invisible\" tooltip=<<delete-note-tooltip>>>{{$:/core/images/delete-button}}</$button></li>\n  </ul>\n</div>\n<div class=\"dnd-clear\"></div>\n</div>\n</$list>\n</$list>\n</$wikify>\n</$wikify>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/ViewTemplate/spell": {
+            "title": "$:/plugins/benwebber/dnd/ui/ViewTemplate/spell",
+            "tags": "$:/tags/ViewTemplate",
+            "list-before": "$:/core/ui/ViewTemplate/body",
+            "text": "<!-- Check tiddler tag. -->\n<$list filter=\"[<currentTiddler>tag{$:/plugins/benwebber/dnd/config/Tags/Spells}]\">\n<!-- Check if user enabled view template; don't override <<currentTiddler>>. -->\n<$list\n  filter=\"[title[$:/plugins/benwebber/dnd/config/ViewTemplates/Spell]field:text[true]]\"\n  variable=\"noop\"\n>\n\n<<dnd.spell>>\n</$list>\n</$list>\n"
+        },
+        "$:/plugins/benwebber/dnd/ui/ViewTemplate/statblock": {
+            "title": "$:/plugins/benwebber/dnd/ui/ViewTemplate/statblock",
+            "tags": "$:/tags/ViewTemplate",
+            "list-before": "$:/core/ui/ViewTemplate/body",
+            "text": "<!-- Check tiddler tag. -->\n<$list filter=\"[<currentTiddler>tag{$:/plugins/benwebber/dnd/config/Tags/Creatures}]\">\n<!-- Check if user enabled view template; don't override <<currentTiddler>>. -->\n<$list\n  filter=\"[title[$:/plugins/benwebber/dnd/config/ViewTemplates/StatBlock]field:text[true]]\"\n  variable=\"noop\"\n>\n\n<<dnd.creature>>\n</$list>\n</$list>\n"
+        }
+    }
+}
