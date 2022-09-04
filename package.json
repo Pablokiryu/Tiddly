@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "dev:start":"tiddlywiki Lacryma --verbose --load ./src/DM-Mirnas.html --rendertiddler ReadMe ./readme.html --listen  host=localhost port=8091"},
   "dependencies": {
-    "tiddlywiki": "^5.2.2"
+    "tiddlywiki": "^5.2.3"
   }
 }
